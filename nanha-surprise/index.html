@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#FFFBFE" />
+  <meta name="description" content="Nanha Surprise — a private birthday & friendship anniversary gift" />
+  <title>Nanha Surprise 🐙</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient layer -->
+  <div class="ambient" aria-hidden="true">
+    <div class="mandala mandala-a"></div>
+    <div class="mandala mandala-b"></div>
+    <div class="mandala mandala-c"></div>
+    <div id="bubbles"></div>
+    <div id="sparkles"></div>
+    <div id="petals"></div>
+  </div>
+
+  <!-- Cursor trail (desktop) -->
+  <div id="cursor-trail" aria-hidden="true"></div>
+
+  <!-- Loader -->
+  <div id="loader" class="loader" role="status" aria-live="polite">
+    <div class="loader-inner glass">
+      <div class="loader-octopus" aria-hidden="true">🐙</div>
+      <p class="script">Nanha is waking up…</p>
+      <div class="loader-bar"><span id="loader-fill"></span></div>
+      <p class="loader-pct"><span id="loader-pct">0</span>%</p>
+    </div>
+  </div>
+
+  <!-- Persistent chrome -->
+  <div class="chrome" id="chrome" hidden>
+    <div class="progress" aria-label="Journey progress">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+        <span class="progress-octopus" id="progress-octopus" aria-hidden="true">🐙</span>
+      </div>
+      <div class="progress-dots" id="progress-dots"></div>
+    </div>
+    <button type="button" class="music-toggle" id="music-toggle" aria-label="Mute music" title="Nanha music">
+      <span class="music-icon" aria-hidden="true">♪</span>
+    </button>
+  </div>
+
+  <main id="app">
+    <!-- 1. NANHA GATE -->
+    <section class="screen" data-screen="gate" aria-label="Nanha Gate">
+      <div class="screen-inner">
+        <div class="octopus-peek" id="gate-octopus" aria-hidden="true">
+          <svg class="octopus-svg" viewBox="0 0 120 140" width="96" height="112">
+            <ellipse cx="60" cy="55" rx="38" ry="36" fill="#B8D4F0"/>
+            <circle cx="48" cy="50" r="8" fill="#fff"/><circle cx="72" cy="50" r="8" fill="#fff"/>
+            <circle class="pupil" cx="50" cy="52" r="4" fill="#3a2a20"/><circle class="pupil" cx="74" cy="52" r="4" fill="#3a2a20"/>
+            <ellipse class="mouth" cx="60" cy="68" rx="8" ry="5" fill="#5C4033"/>
+            <path d="M30 80 Q20 110 28 130" stroke="#9BB8D8" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M45 88 Q40 118 42 132" stroke="#9BB8D8" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M75 88 Q80 118 78 132" stroke="#9BB8D8" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M90 80 Q100 110 92 130" stroke="#9BB8D8" stroke-width="10" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="glass card gate-card">
+          <p class="eyebrow">Nanha Gate 🔐</p>
+          <h1 class="script gate-q">Which was the best day of my life? 💫</h1>
+          <div class="pill-grid" id="gate-options" role="group" aria-label="Date options"></div>
+          <p class="hint" id="gate-hint" hidden>Hmm, think again, nanha 🐙</p>
+          <div class="countdown" id="gate-countdown" hidden></div>
+          <button type="button" class="btn btn-primary" id="gate-continue" hidden>Open Nanha Gate ✨</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. HAPPY BIRTHDAY -->
+    <section class="screen" data-screen="birthday" aria-label="Happy Birthday" hidden>
+      <div class="screen-inner scrollable">
+        <div class="mandala-halo" aria-hidden="true"></div>
+        <div id="balloons" aria-hidden="true"></div>
+        <h1 class="script shimmer title-reveal" id="bday-title"></h1>
+        <p class="quote" id="bday-quote"></p>
+
+        <div class="glass card interact-card">
+          <p class="card-label">Nanha Treat 🍬</p>
+          <div class="katli-row">
+            <div class="katli" id="katli" draggable="true" aria-label="Kaju katli, drag to feed">
+              <svg viewBox="0 0 64 64" width="64" height="64"><polygon points="32,6 58,32 32,58 6,32" fill="#F5E6A3" stroke="#C4A35A" stroke-width="2"/><polygon points="32,16 48,32 32,48 16,32" fill="#FFF8DC" opacity=".7"/><circle cx="32" cy="32" r="4" fill="#8B4513"/></svg>
+            </div>
+            <div class="feed-target" id="feed-target">
+              <span class="feed-octopus" aria-hidden="true">🐙</span>
+              <span class="speech" id="yum-bubble" hidden>Yummm, nanha!</span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-soft" id="feed-btn">Feed me 🍬</button>
+        </div>
+
+        <div class="glass card interact-card">
+          <p class="card-label">Nanha Cake 🎂</p>
+          <div class="cake-stage" id="cake-stage">
+            <div class="chars">
+              <img class="char" data-src="assets/char1.png" alt="Friend 1" />
+              <img class="char" data-src="assets/char2.png" alt="Friend 2" />
+              <img class="char" data-src="assets/char3.png" alt="Friend 3" />
+            </div>
+            <div class="cake" id="cake">
+              <div class="candles"><span></span><span></span><span></span></div>
+              <div class="cake-top"></div>
+              <div class="cake-mid"></div>
+              <div class="cake-base"></div>
+              <div class="cake-slice left"></div>
+              <div class="cake-slice right"></div>
+              <div class="extras" aria-hidden="true">🍫 🍍 🍔</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-soft" id="cut-cake-btn">Cut the cake 🔪</button>
+        </div>
+
+        <button type="button" class="btn btn-primary next-btn" data-next="year">Next, nanha →</button>
+      </div>
+    </section>
+
+    <!-- 3. ONE YEAR -->
+    <section class="screen" data-screen="year" aria-label="One year together" hidden>
+      <div class="screen-inner">
+        <div class="glass card year-card">
+          <p class="eyebrow">Nanha Anniversary</p>
+          <h1 class="script">Congratulations on 1 year of Nanha Togetherness 🎉</h1>
+          <div class="glow-one" aria-hidden="true">1</div>
+          <p class="quote" id="year-quote"></p>
+          <div class="distance-viz" aria-hidden="true">
+            <span class="lantern l1">🏮</span>
+            <div class="soft-line"></div>
+            <span class="lantern l2">🏮</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary next-btn" data-next="baby">Next, nanha →</button>
+      </div>
+    </section>
+
+    <!-- 4. BABY PHOTO -->
+    <section class="screen" data-screen="baby" aria-label="Nanha Baby Photo" hidden>
+      <div class="screen-inner scrollable">
+        <h2 class="script">Nanha Baby Photo 👶</h2>
+        <div class="polaroid bloom" id="baby-frame">
+          <div class="curtain" id="baby-curtain"></div>
+          <img data-src="assets/baby.jpg" alt="A precious baby photo" class="polaroid-img" />
+          <p class="polaroid-cap" id="baby-caption"></p>
+        </div>
+        <p class="quote" id="baby-quote"></p>
+        <h3 class="script section-h">Beautiful facts</h3>
+        <div class="facts" id="facts"></div>
+        <button type="button" class="btn btn-primary next-btn" data-next="dive">Let's dive in →</button>
+      </div>
+    </section>
+
+    <!-- 5. DIVE TRANSITION -->
+    <section class="screen" data-screen="dive" aria-label="Dive into memories" hidden>
+      <div class="water-overlay" id="water-overlay" aria-hidden="true">
+        <div class="fish f1">🐟</div>
+        <div class="fish f2">🐠</div>
+        <div class="fish f3">🐙</div>
+        <div class="jelly">🪼</div>
+      </div>
+      <div class="screen-inner dive-inner">
+        <h1 class="script dive-text" id="dive-text">Let's dive into our memories… 🌊</h1>
+      </div>
+    </section>
+
+    <!-- 6. MEMORIES -->
+    <section class="screen" data-screen="memories" aria-label="Nanha Memories" hidden>
+      <div class="screen-inner scrollable">
+        <h2 class="script">Nanha Memories 🗺️</h2>
+        <p class="sub">Our little timeline of togetherness</p>
+        <div class="timeline" id="timeline">
+          <div class="timeline-line" aria-hidden="true"></div>
+        </div>
+        <button type="button" class="btn btn-primary next-btn" data-next="admire">Next, nanha →</button>
+      </div>
+    </section>
+
+    <!-- 7. ADMIRE -->
+    <section class="screen" data-screen="admire" aria-label="What I admire" hidden>
+      <div class="screen-inner scrollable">
+        <h2 class="script">What I love &amp; admire about you</h2>
+        <p class="sub">Tap each Nanha lantern ✨</p>
+        <div class="lanterns" id="lanterns"></div>
+        <div class="admire-reveal" id="admire-reveal"></div>
+        <button type="button" class="btn btn-primary next-btn" id="admire-next" data-next="letter" hidden>Read Nanha Letter →</button>
+      </div>
+    </section>
+
+    <!-- 8. LETTER -->
+    <section class="screen" data-screen="letter" aria-label="Nanha Letter" hidden>
+      <div class="screen-inner">
+        <h2 class="script">Nanha Letter 💌</h2>
+        <div class="envelope-wrap" id="envelope-wrap">
+          <div class="envelope" id="envelope">
+            <div class="env-flap"></div>
+            <div class="env-body"></div>
+            <button type="button" class="wax-seal" id="wax-seal" aria-label="Break the seal">
+              <span aria-hidden="true">🐙</span>
+            </button>
+          </div>
+          <div class="letter-paper" id="letter-paper" hidden>
+            <p class="letter-body" id="letter-body"></p>
+            <button type="button" class="btn btn-soft" id="skip-typing" hidden>Skip typing ✨</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary next-btn" id="letter-next" data-next="quiz" hidden>Nanha Quiz →</button>
+      </div>
+    </section>
+
+    <!-- 9. QUIZ -->
+    <section class="screen" data-screen="quiz" aria-label="Nanha Quiz" hidden>
+      <div class="screen-inner">
+        <h2 class="script">Nanha Quiz 🎁</h2>
+        <p class="sub">Unlock the mystery gift, nanha</p>
+        <div class="quiz-box-glow" id="quiz-gift" aria-hidden="true">🎁</div>
+        <div class="quiz-progress"><div id="quiz-bar"></div></div>
+        <div class="glass card quiz-card">
+          <p class="quiz-q" id="quiz-q"></p>
+          <div class="quiz-opts" id="quiz-opts"></div>
+          <p class="hint" id="quiz-hint" hidden>Try again, nanha 🥺</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. GIFT -->
+    <section class="screen" data-screen="gift" aria-label="Nanha Gift" hidden>
+      <div class="screen-inner scrollable">
+        <h2 class="script">Nanha Gift 🎀</h2>
+        <button type="button" class="gift-box" id="gift-box" aria-label="Open gift">
+          <div class="gift-lid">🎀</div>
+          <div class="gift-body">🎁</div>
+        </button>
+        <div class="gift-reveal" id="gift-reveal" hidden>
+          <div class="polaroid soft-frame">
+            <img data-src="assets/hand-gift.jpg" alt="A hand holding your gift" class="polaroid-img" />
+          </div>
+          <p class="gift-msg">To receive your gift, you need to meet me in person 🎁</p>
+          <div class="meet-area" id="meet-area">
+            <button type="button" class="btn btn-yes" id="yes-btn">
+              <span class="puppy-eyes" aria-hidden="true">
+                <svg viewBox="0 0 80 40" width="64" height="32"><ellipse cx="22" cy="20" rx="14" ry="16" fill="#fff" stroke="#5C4033" stroke-width="2"/><ellipse cx="58" cy="20" rx="14" ry="16" fill="#fff" stroke="#5C4033" stroke-width="2"/><circle cx="24" cy="22" r="7" fill="#3a2a20"/><circle cx="60" cy="22" r="7" fill="#3a2a20"/><circle cx="26" cy="18" r="3" fill="#fff"/><circle cx="62" cy="18" r="3" fill="#fff"/><path class="tear" d="M22 34 q0 8 4 10" stroke="#A8D8FF" stroke-width="3" fill="none"/></svg>
+              </span>
+              Yes, I will meet you 💖
+            </button>
+            <button type="button" class="btn btn-no" id="no-btn">No 😢</button>
+            <span class="sad-emoji" id="sad-emoji" aria-hidden="true">😢</span>
+          </div>
+        </div>
+        <div class="celebration" id="celebration" hidden>
+          <div class="cats" id="cats"></div>
+          <p class="script celebrate-text">Yay!! It's a date, nanha! 🥳</p>
+          <div class="dance-octopus" aria-hidden="true">🐙💃</div>
+          <button type="button" class="btn btn-primary next-btn" data-next="final">Continue →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. FINAL -->
+    <section class="screen" data-screen="final" aria-label="Closing" hidden>
+      <div class="screen-inner">
+        <div class="glass card final-card">
+          <div class="drift-lanterns" aria-hidden="true"><span>🏮</span><span>🏮</span><span>🏮</span></div>
+          <h2 class="script">Forever Nanha</h2>
+          <p class="quote" id="final-quote"></p>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="to-gallery">View Nanha Gallery 📸</button>
+          <button type="button" class="btn btn-soft" id="replay">Replay from start 🔁</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. GALLERY -->
+    <section class="screen" data-screen="gallery" aria-label="Nanha Gallery" hidden>
+      <div class="screen-inner scrollable">
+        <h2 class="script">Nanha Gallery 📸</h2>
+        <p class="sub">Little windows into your smile</p>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <button type="button" class="glass cloud-card" id="cloud-card">
+          <span class="cloud-guard" aria-hidden="true">🐙☁️</span>
+          <span><strong>Open Nanha Cloud ☁️</strong><br/>Keep your photos, GIFs &amp; memories safe in Nanha Cloud<br/><small>Safely backed up to your private Nanha Cloud 🔒 — only you can see it.</small></span>
+        </button>
+        <button type="button" class="btn btn-soft" id="back-final">← Back</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Nanha Cloud panel -->
+  <div class="cloud-panel" id="cloud-panel" hidden role="dialog" aria-modal="true" aria-label="Nanha Cloud">
+    <div class="cloud-panel-header">
+      <h2>Nanha Cloud ☁️🐙</h2>
+      <button type="button" class="cloud-panel-close" id="cloud-panel-close" aria-label="Close">×</button>
+    </div>
+    <div class="cloud-storage" id="cloud-storage">
+      <strong>Storage</strong>
+      <div class="cloud-storage-bar"><div class="cloud-storage-fill" id="cloud-storage-fill"></div></div>
+      <div class="cloud-storage-meta" id="cloud-storage-meta">Loading quota…</div>
+    </div>
+    <div class="cloud-toolbar">
+      <div class="cloud-filters" role="tablist">
+        <button type="button" class="cloud-chip is-active" data-filter="all">All</button>
+        <button type="button" class="cloud-chip" data-filter="image">Images</button>
+        <button type="button" class="cloud-chip" data-filter="gif">GIFs</button>
+        <button type="button" class="cloud-chip" data-filter="video">Videos</button>
+        <button type="button" class="cloud-chip" data-filter="document">Docs</button>
+        <button type="button" class="cloud-chip" data-filter="trash">Trash</button>
+      </div>
+      <input type="search" class="cloud-search" id="cloud-search" placeholder="Search files…" autocomplete="off" />
+      <select class="cloud-sort" id="cloud-sort" aria-label="Sort">
+        <option value="date:desc">Newest</option>
+        <option value="date:asc">Oldest</option>
+        <option value="name:asc">Name A–Z</option>
+        <option value="name:desc">Name Z–A</option>
+        <option value="size:desc">Largest</option>
+        <option value="size:asc">Smallest</option>
+        <option value="type:asc">Type</option>
+      </select>
+      <button type="button" class="cloud-view-toggle" id="cloud-view-toggle">List</button>
+    </div>
+    <div class="cloud-dropzone" id="cloud-dropzone">
+      <p>Drag &amp; drop photos, animated GIFs, videos or documents</p>
+      <button type="button" class="cloud-drop-btn" id="cloud-open-picker">Choose files</button>
+      <input type="file" id="cloud-input" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.gif,.heic,.heif,.bmp,.svg,.mp4,.webm,.mov,.mkv" multiple hidden />
+    </div>
+    <div class="cloud-progress-list" id="cloud-progress-list"></div>
+    <p class="cloud-status" id="cloud-status" hidden></p>
+    <div class="cloud-body">
+      <div class="cloud-grid" id="cloud-files"></div>
+      <p class="cloud-empty" id="cloud-empty">No files yet</p>
+    </div>
+    <div class="cloud-footer">
+      <div class="cloud-bulk-bar" id="cloud-bulk-bar">
+        <span id="cloud-sel-count">0 selected</span>
+        <button type="button" class="btn btn-soft" id="cloud-bulk-trash">Trash selected</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cloud-preview" id="cloud-preview" hidden>
+    <div class="cloud-preview-media" id="cloud-preview-media"></div>
+    <div class="cloud-preview-info" id="cloud-preview-info"></div>
+    <div class="cloud-preview-actions">
+      <button type="button" id="cloud-preview-download">Download</button>
+      <button type="button" id="cloud-preview-trash">Trash</button>
+      <button type="button" id="cloud-preview-close">Close</button>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button type="button" class="lb-close" id="lb-close" aria-label="Close">×</button>
+    <button type="button" class="lb-nav prev" id="lb-prev" aria-label="Previous">‹</button>
+    <img id="lb-img" alt="" />
+    <button type="button" class="lb-nav next" id="lb-next" aria-label="Next">›</button>
+  </div>
+
+  <audio id="bg-music" src="assets/music.mp3" loop preload="auto"></audio>
+
+  <link rel="stylesheet" href="cloud/cloud.css" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"></script>
+  <script src="cloud/cloud.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

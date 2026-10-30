@@ -1,0 +1,90 @@
+import { Gallery } from "../models/Gallery.js";
+import { withDriveRetry } from "./driveClient.js";
+import { env } from "../config/env.js";
+
+async function findOrCreateFolder(drive, name, parentId) {
+  const qParts = [
+    `name = '${name.replace(/'/g, "\\'")}'`,
+    "mimeType = 'application/vnd.google-apps.folder'",
+    "trashed = false",
+  ];
+  if (parentId) qParts.push(`'${parentId}' in parents`);
+  const list = await drive.files.list({
+    q: qParts.join(" and "),
+    fields: "files(id, name)",
+    spaces: "drive",
+    pageSize: 5,
+  });
+  if (list.data.files?.length) {
+    return list.data.files[0].id;
+  }
+  const created = await drive.files.create({
+    requestBody: {
+      name,
+      mimeType: "application/vnd.google-apps.folder",
+      parents: parentId ? [parentId] : undefined,
+    },
+    fields: "id",
+  });
+  return created.data.id;
+}
+
+/**
+ * Ensure NanhaCloud/galleries/<galleryId>/{images,gifs,videos,documents,thumbnails,.trash}
+ */
+export async function ensureGalleryFolders(galleryId = env.GALLERY_ID) {
+  let gallery = await Gallery.findById(galleryId);
+  if (
+    gallery?.folderIds?.images &&
+    gallery?.folderIds?.gifs &&
+    gallery?.folderIds?.videos &&
+    gallery?.folderIds?.documents &&
+    gallery?.folderIds?.thumbnails &&
+    gallery?.folderIds?.trash
+  ) {
+    return gallery;
+  }
+
+  return withDriveRetry(async (drive) => {
+    const rootId = await findOrCreateFolder(drive, "NanhaCloud", null);
+    const galleriesId = await findOrCreateFolder(drive, "galleries", rootId);
+    const galleryRootId = await findOrCreateFolder(drive, galleryId, galleriesId);
+
+    const folderIds = {
+      root: galleryRootId,
+      images: await findOrCreateFolder(drive, "images", galleryRootId),
+      gifs: await findOrCreateFolder(drive, "gifs", galleryRootId),
+      videos: await findOrCreateFolder(drive, "videos", galleryRootId),
+      documents: await findOrCreateFolder(drive, "documents", galleryRootId),
+      thumbnails: await findOrCreateFolder(drive, "thumbnails", galleryRootId),
+      trash: await findOrCreateFolder(drive, ".trash", galleryRootId),
+    };
+
+    gallery = await Gallery.findByIdAndUpdate(
+      galleryId,
+      {
+        _id: galleryId,
+        displayName: "Nanha Gallery",
+        rootFolderId: galleryRootId,
+        folderIds,
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    return gallery;
+  });
+}
+
+export function categoryFolderKey(category) {
+  switch (category) {
+    case "gif":
+      return "gifs";
+    case "image":
+      return "images";
+    case "video":
+      return "videos";
+    case "document":
+      return "documents";
+    default:
+      return "documents";
+  }
+}
