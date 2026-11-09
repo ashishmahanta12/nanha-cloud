@@ -10,19 +10,17 @@ import { loadEnv } from "./config/env.js";
 import { connectMongo } from "./db/mongo.js";
 import { ensureGalleryFolders } from "./drive/folders.js";
 import { ensureSeedInvite } from "./auth/invite.js";
+import { resyncGalleryFromDrive } from "./services/resync.js";
 import { initCloudNamespace } from "./sockets/progress.js";
 import { errorHandler, notFound } from "./middleware/errors.js";
-import { purgeExpiredTrash } from "./routes/trash.js";
 
 import authRoutes from "./routes/auth.js";
 import assetsRoutes from "./routes/assets.js";
 import uploadsRoutes from "./routes/uploads.js";
-import trashRoutes, {
-  trashAsset,
-  restoreAsset,
-  permanentDeleteAsset,
-} from "./routes/trash.js";
+import trashRoutes, { trashAsset, restoreAsset } from "./routes/trash.js";
 import storageRoutes from "./routes/storage.js";
+import youtubeRoutes from "./routes/youtube.js";
+import quizRoutes from "./routes/quiz.js";
 import { requireSession } from "./auth/requireSession.js";
 
 export function createApp(envOverrides = {}) {
@@ -39,9 +37,23 @@ export function createApp(envOverrides = {}) {
       crossOriginEmbedderPolicy: false,
     })
   );
+  const corsAllowList = [
+    env.PUBLIC_BASE_URL,
+    ...(env.CORS_ORIGINS || []),
+  ]
+    .filter(Boolean)
+    .map((o) => o.replace(/\/$/, ""));
+
   app.use(
     cors({
-      origin: env.PUBLIC_BASE_URL || true,
+      origin(origin, cb) {
+        // Non-browser or same-origin tools may omit Origin
+        if (!origin) return cb(null, true);
+        if (corsAllowList.length === 0) return cb(null, true);
+        const normalized = origin.replace(/\/$/, "");
+        if (corsAllowList.includes(normalized)) return cb(null, true);
+        return cb(null, false);
+      },
       credentials: true,
     })
   );
@@ -52,23 +64,43 @@ export function createApp(envOverrides = {}) {
     res.json({ ok: true, service: "nanha-cloud" });
   });
 
+  // Private gift site: expose access code to same-origin client so Cloud unlocks without ?invite=
+  app.get("/api/cloud/client-config", (_req, res) => {
+    res.json({
+      galleryId: env.GALLERY_ID || null,
+      accessCode: env.GALLERY_ACCESS_CODE || null,
+    });
+  });
+
   app.use("/api/auth", authRoutes);
   app.use("/api/cloud/uploads", uploadsRoutes);
   app.use("/api/cloud/assets", assetsRoutes);
-  // Plan paths: trash list + actions also under trash router aliases
+  // Soft-trash only — never permanently delete assets
   app.use("/api/cloud/trash", trashRoutes);
   app.post("/api/cloud/assets/:id/trash", requireSession, trashAsset);
   app.post("/api/cloud/assets/:id/restore", requireSession, restoreAsset);
-  app.delete("/api/cloud/assets/:id", requireSession, permanentDeleteAsset);
   app.use("/api/cloud/storage", storageRoutes);
+  app.use("/api/youtube", youtubeRoutes);
+  app.use("/api/quiz", quizRoutes);
 
-  // Static gift site
+  // Static gift site — no-cache HTML/JS/CSS so UI edits show on refresh
   app.use(
     express.static(env.STATIC_DIR, {
       index: "index.html",
       extensions: ["html"],
+      setHeaders(res, filePath) {
+        if (/\.(html|js|css)$/i.test(filePath)) {
+          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        }
+      },
     })
   );
+
+  // Hidden quiz results page — exact URL only; not linked from the site
+  app.get(["/Answer", "/Answer.html"], (_req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    res.sendFile(path.join(env.STATIC_DIR, "Answer.html"));
+  });
 
   app.get("*", (req, res, next) => {
     if (req.path.startsWith("/api/")) return next();
@@ -93,6 +125,10 @@ export async function startServer() {
     try {
       await ensureGalleryFolders(env.GALLERY_ID);
       console.log("[nanha-cloud] Drive folder taxonomy ready");
+      const sync = await resyncGalleryFromDrive(env.GALLERY_ID);
+      console.log(
+        `[nanha-cloud] Drive resync: ${sync.created} restored, ${sync.updated} updated, ${sync.skipped} skipped`
+      );
     } catch (err) {
       console.warn("[nanha-cloud] Drive bootstrap deferred:", err.message);
     }
@@ -102,15 +138,16 @@ export async function startServer() {
 
   const app = createApp(env);
   const server = http.createServer(app);
+  const socketOrigins = [env.PUBLIC_BASE_URL, ...(env.CORS_ORIGINS || [])]
+    .filter(Boolean)
+    .map((o) => o.replace(/\/$/, ""));
   const io = new Server(server, {
-    cors: { origin: env.PUBLIC_BASE_URL || true, credentials: true },
+    cors: {
+      origin: socketOrigins.length ? socketOrigins : true,
+      credentials: true,
+    },
   });
   initCloudNamespace(io);
-
-  // Trash retention purge hourly
-  setInterval(() => {
-    purgeExpiredTrash().catch((e) => console.error("purge error", e.message));
-  }, 60 * 60 * 1000);
 
   server.listen(env.PORT, () => {
     console.log(`[nanha-cloud] listening on ${env.PUBLIC_BASE_URL || `http://localhost:${env.PORT}`}`);

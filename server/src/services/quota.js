@@ -28,10 +28,13 @@ export async function getStorageQuota(galleryId) {
     fileCount += row.count;
   }
 
+  const unlimited = limit == null;
+
   return {
     used: usage,
     total: limit,
-    available: limit != null && usage != null ? Math.max(0, limit - usage) : null,
+    available: !unlimited && usage != null ? Math.max(0, limit - usage) : null,
+    unlimited,
     usageInDrive,
     usedByApp,
     fileCount,

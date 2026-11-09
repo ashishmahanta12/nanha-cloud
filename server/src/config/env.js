@@ -47,10 +47,24 @@ export function loadEnv({ strict = true } = {}) {
     .map((s) => s.trim())
     .filter(Boolean);
 
+  const corsOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const PUBLIC_BASE_URL =
+    process.env.PUBLIC_BASE_URL || `http://localhost:${process.env.PORT || 8080}`;
+
+  // When frontend is on another origin (e.g. Cloudflare Pages talking to Render
+  // without a same-origin proxy), cross-site cookies need SameSite=None; Secure.
+  const cookieSameSite = (process.env.COOKIE_SAMESITE || "").toLowerCase() ||
+    (corsOrigins.length > 0 ? "none" : "lax");
+
   return {
     PORT: Number(process.env.PORT || 8080),
     NODE_ENV,
-    PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL || `http://localhost:${process.env.PORT || 8080}`,
+    PUBLIC_BASE_URL,
+    CORS_ORIGINS: corsOrigins,
     MONGODB_URI: process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/nanha-cloud",
     SESSION_SECRET: SESSION_SECRET || "dev-session-secret-at-least-32-chars!",
     GALLERY_ID: process.env.GALLERY_ID || "nanhi-bacchi",
@@ -64,7 +78,10 @@ export function loadEnv({ strict = true } = {}) {
     ALLOWED_MIME: allowedMime,
     COOKIE_NAME: process.env.COOKIE_NAME || "nanha_session",
     COOKIE_MAX_AGE_DAYS: Number(process.env.COOKIE_MAX_AGE_DAYS || 30),
+    COOKIE_SAMESITE: cookieSameSite,
     TRASH_RETENTION_DAYS: Number(process.env.TRASH_RETENTION_DAYS || 30),
+    YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY || "",
+    YOUTUBE_PLAYLIST_ID: process.env.YOUTUBE_PLAYLIST_ID || "",
     STATIC_DIR: path.resolve(__dirname, "../../../nanha-surprise"),
     TMP_DIR: path.resolve(__dirname, "../../uploads/tmp"),
   };

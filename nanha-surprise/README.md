@@ -15,13 +15,12 @@ Open `index.html` in a browser (or host it — see below). Best experienced on a
 
 ---
 
-## (a) Where to put photos, characters, music & GIFs
+## (a) Where to put photos, characters & GIFs
 
 | File | Purpose |
 |------|---------|
-| `assets/music.mp3` | Soft lo-fi / piano / acoustic (royalty-free). Starts on Nanha Gate continue. |
 | `assets/baby.jpg` | Baby photo (Screen 4) |
-| `assets/hand-gift.jpg` | Hand holding gift (Screen 10) |
+| `assets/gallery/gift.webp` | Hand holding gift (Screen 10) |
 | `assets/char1.png` | Cake character 1 |
 | `assets/char2.png` | Cake character 2 |
 | `assets/char3.png` | Cake character 3 |
@@ -44,7 +43,7 @@ Open **`script.js`** and edit only the **`CONFIG`** block at the top:
 - `memories[]` — date, title, caption, photo, icon
 - `admire[]` — lantern reasons
 - `quiz[]` — questions, options, `correctIndex` (0-based)
-- `gallery[]` / `cats[]` / `music` — asset paths
+- `gallery[]` / `cats[]` — asset paths
 - `gateOptions` — Nanha Gate dates (`correct: true` on 10 Nov)
 
 No rebuild step — save and refresh.
@@ -104,12 +103,24 @@ Privacy: files live in **your central Google Drive vault**, gated by the invite 
 
 ---
 
+## Nanha Music playlist (chrome note button)
+
+The circular music button in the top bar opens a Nanha Music panel (track list + player).
+
+1. In `server/.env`, set:
+   - `YOUTUBE_API_KEY=` your Google Cloud API key (Data API enabled)
+   - `YOUTUBE_PLAYLIST_ID=` the `list=` value from your playlist URL (Public or Unlisted)
+2. Run the Express server (`cd ../server && npm start`) — static-only hosts cannot load the playlist.
+3. Restrict the API key to your site’s domain in Google Cloud Console.
+
+Songs start when she taps **Open Nanha Surprise**. Mute from the panel chip.
+
 ## Tech notes
 
-- Vanilla HTML / CSS / JS (+ `cloud/cloud.js` panel)
+- Vanilla HTML / CSS / JS (+ `cloud/cloud.js` panel, `music/playlist-player.js`)
 - GSAP + canvas-confetti + Socket.IO client via CDN
 - Backend: Express, MongoDB, Google Drive API, Sharp (static thumbs only)
-- Music unlocks on first Gate continue (browser autoplay rules)
+- Playlist music starts on first open gesture (browser autoplay rules)
 - `prefers-reduced-motion` softens animations
 - Mobile-first with safe-area padding
 

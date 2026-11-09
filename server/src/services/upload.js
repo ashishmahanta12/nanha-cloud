@@ -12,7 +12,9 @@ import { ensureGalleryFolders, categoryFolderKey } from "../drive/folders.js";
 import { getDrive, withDriveRetry } from "../drive/driveClient.js";
 import { validateFileBuffer } from "./validate.js";
 import { generateStaticThumbnail, readImageDimensions } from "./thumbnail.js";
+import { generateVideoThumbnailFromPath } from "./videoThumb.js";
 import { getIo } from "../sockets/progress.js";
+import { parseWhatsAppTimestamp } from "./whatsappMeta.js";
 
 function emit(galleryId, event, payload) {
   try {
@@ -23,11 +25,17 @@ function emit(galleryId, event, payload) {
   }
 }
 
-export async function initUpload({ galleryId, name, size, mimeType, category }) {
+export async function initUpload({ galleryId, name, size, mimeType, category, capturedAt }) {
   await fsp.mkdir(env.TMP_DIR, { recursive: true });
   const uploadId = uuidv4();
   const tempPath = path.join(env.TMP_DIR, `${uploadId}.part`);
   await fsp.writeFile(tempPath, Buffer.alloc(0));
+
+  const fromName = parseWhatsAppTimestamp(name);
+  const captured =
+    capturedAt instanceof Date && !Number.isNaN(capturedAt.getTime())
+      ? capturedAt
+      : fromName;
 
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const session = await UploadSession.create({
@@ -41,6 +49,7 @@ export async function initUpload({ galleryId, name, size, mimeType, category }) 
     bytesReceived: 0,
     status: "in_progress",
     expiresAt,
+    capturedAt: captured || null,
   });
 
   return { uploadId: session._id, totalBytes: size };
@@ -226,7 +235,9 @@ export async function completeUpload(uploadId) {
   let height = null;
   let thumbnailDriveId = null;
 
-  if (session.mimeType.startsWith("image/")) {
+  const needsThumb =
+    session.mimeType.startsWith("image/") || session.mimeType.startsWith("video/");
+  if (needsThumb) {
     emit(session.galleryId, "upload:progress", {
       uploadId: session._id,
       phase: "thumbnailing",
@@ -234,7 +245,9 @@ export async function completeUpload(uploadId) {
       totalBytes: session.totalBytes,
       percent: 100,
     });
+  }
 
+  if (session.mimeType.startsWith("image/")) {
     // Read a bounded slice for thumbs to avoid loading huge GIFs fully when possible.
     // For correctness of dimensions + first-frame thumb we still need the file;
     // Sharp with animated:false only decodes page 1.
@@ -261,7 +274,30 @@ export async function completeUpload(uploadId) {
       if (thumb.width) width = thumb.width;
       if (thumb.height) height = thumb.height;
     }
+  } else if (session.mimeType.startsWith("video/")) {
+    const thumb = await generateVideoThumbnailFromPath(session.tempPath);
+    if (thumb.buffer && !thumb.skipped) {
+      const thumbMeta = await uploadBufferToDrive({
+        buffer: thumb.buffer,
+        name: `thumb_${assetId}.webp`,
+        mimeType: "image/webp",
+        parentId: gallery.folderIds.thumbnails,
+        appProperties: {
+          galleryId: session.galleryId,
+          category: "thumbnail",
+          assetId: String(assetId),
+        },
+      });
+      thumbnailDriveId = thumbMeta.id;
+      if (thumb.width) width = thumb.width;
+      if (thumb.height) height = thumb.height;
+    }
   }
+
+  const capturedAt =
+    session.capturedAt ||
+    parseWhatsAppTimestamp(session.originalName) ||
+    new Date();
 
   const asset = await Asset.create({
     _id: assetId,
@@ -269,13 +305,15 @@ export async function completeUpload(uploadId) {
     driveFileId: driveFile.id,
     thumbnailDriveId,
     originalName: session.originalName,
-    name: session.originalName,
+    name: "",
+    caption: "",
     mimeType: session.mimeType,
     category: session.category,
     size: session.totalBytes,
     width,
     height,
     checksum,
+    capturedAt,
     status: "active",
   });
 
@@ -346,4 +384,83 @@ export async function downloadDriveFileStream(fileId) {
     );
     return res.data;
   });
+}
+
+async function downloadDriveFileToPath(fileId, destPath) {
+  const stream = await downloadDriveFileStream(fileId);
+  await new Promise((resolve, reject) => {
+    const ws = fs.createWriteStream(destPath);
+    stream.on("error", reject);
+    ws.on("error", reject);
+    ws.on("finish", resolve);
+    stream.pipe(ws);
+  });
+}
+
+/**
+ * Generate + attach a missing thumbnail for an existing asset (images & videos).
+ * Prefers a local sourcePath when provided (faster than Drive download).
+ */
+export async function backfillAssetThumbnail(asset, { sourcePath = null } = {}) {
+  if (!asset) throw new Error("Asset required");
+  if (asset.thumbnailDriveId) {
+    return { asset: serializeAsset(asset), skipped: true, reason: "already-has-thumb" };
+  }
+
+  const gallery = await ensureGalleryFolders(asset.galleryId);
+  const parentId = gallery.folderIds.thumbnails;
+  if (!parentId) throw new Error("Thumbnails folder missing");
+
+  await fsp.mkdir(env.TMP_DIR, { recursive: true });
+  const tmpDir = await fsp.mkdtemp(path.join(env.TMP_DIR, "rethumb-"));
+  const safeName = path.basename(asset.originalName || "media.bin") || "media.bin";
+  const localPath = sourcePath || path.join(tmpDir, safeName);
+  let cleanupLocal = !sourcePath;
+
+  try {
+    if (!sourcePath) {
+      await downloadDriveFileToPath(asset.driveFileId, localPath);
+    }
+
+    let thumb;
+    if (asset.mimeType?.startsWith("image/") || asset.category === "image" || asset.category === "gif") {
+      const buf = await fsp.readFile(localPath);
+      thumb = await generateStaticThumbnail(buf, asset.mimeType);
+      if (thumb.width) asset.width = thumb.width;
+      if (thumb.height) asset.height = thumb.height;
+    } else if (asset.mimeType?.startsWith("video/") || asset.category === "video") {
+      thumb = await generateVideoThumbnailFromPath(localPath);
+      if (thumb.width) asset.width = thumb.width;
+      if (thumb.height) asset.height = thumb.height;
+    } else {
+      return { asset: serializeAsset(asset), skipped: true, reason: "unsupported" };
+    }
+
+    if (!thumb?.buffer || thumb.skipped) {
+      return {
+        asset: serializeAsset(asset),
+        skipped: true,
+        reason: thumb?.reason || "thumb-failed",
+      };
+    }
+
+    const thumbMeta = await uploadBufferToDrive({
+      buffer: thumb.buffer,
+      name: `thumb_${asset._id}.webp`,
+      mimeType: "image/webp",
+      parentId,
+      appProperties: {
+        galleryId: asset.galleryId,
+        category: "thumbnail",
+        assetId: String(asset._id),
+      },
+    });
+    asset.thumbnailDriveId = thumbMeta.id;
+    await asset.save();
+    return { asset: serializeAsset(asset), skipped: false };
+  } finally {
+    if (cleanupLocal) {
+      await fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+    }
+  }
 }

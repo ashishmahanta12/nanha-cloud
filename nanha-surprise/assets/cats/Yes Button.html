@@ -1,0 +1,344 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Yes Button</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=swap">
+<style>
+  /* Layout: one centered button; the two eyes sit above the "Yes" label inside it. */
+  :root {
+    --bg: #f4eef2;
+    --fg: #3a2a3a;
+    --muted: #7d6a7a;
+    --focus: #2b6ad8;
+    --btn-a: #ff9468;
+    --btn-b: #f2507a;
+    --btn-c: #d9387f;
+    --btn-shadow: rgba(217, 56, 127, 0.38);
+    --font-display: "Fredoka", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17111a; --fg: #f3e7ef; --muted: #a692a3; --focus: #8fb6ff;
+      --btn-shadow: rgba(0, 0, 0, 0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17111a; --fg: #f3e7ef; --muted: #a692a3; --focus: #8fb6ff;
+    --btn-shadow: rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+  }
+
+  html, body { height: 100%; }
+  body {
+    box-sizing: border-box;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    display: grid;
+    place-items: center;
+    padding-block: 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { display: flex; flex-direction: column; align-items: center; gap: 24px; min-width: 0; }
+
+  .yes {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 30px clamp(24px, 8vw, 44px) 22px;
+    border-radius: 44px;
+    color: #fff;
+    background: linear-gradient(160deg, var(--btn-a) 0%, var(--btn-b) 55%, var(--btn-c) 100%);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -6px 14px rgba(120, 10, 70, 0.18),
+      0 18px 36px -10px var(--btn-shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .yes:hover { transform: translateY(-2px); }
+  .yes:active { transform: translateY(1px) scale(0.985); }
+  .yes:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+
+  .eyes { display: flex; gap: clamp(16px, 6vw, 36px); }
+  .eye { width: clamp(88px, 27vw, 122px); height: auto; display: block; overflow: visible; }
+  .art { transform-box: view-box; transform-origin: 64px 74px; }
+  .yes.blink .art { animation: blink 0.26s ease-in-out; }
+  @keyframes blink { 0%, 100% { transform: scaleY(1); } 45% { transform: scaleY(0.08); } }
+
+  .label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 6px rgba(120, 10, 70, 0.35);
+  }
+
+  .hint { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); text-align: center; max-width: 30ch; text-wrap: balance; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .yes, .yes:hover, .yes:active { transition: none; }
+    .yes.blink .art { animation: none; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="irisBase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#09204b"/>
+      <stop offset="0.3" stop-color="#0c3670"/>
+      <stop offset="0.6" stop-color="#104a84"/>
+      <stop offset="0.85" stop-color="#1668a0"/>
+      <stop offset="1" stop-color="#1e92b8"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="48%" r="52%">
+      <stop offset="0.62" stop-color="#041238" stop-opacity="0"/>
+      <stop offset="1" stop-color="#041238" stop-opacity="0.65"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#4cf3df" stop-opacity="1"/>
+      <stop offset="0.6" stop-color="#2fd6d6" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#2fd6d6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowSide" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#3fe4d8" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#3fe4d8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lidShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#041338" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#041338" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="pupilGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#010720"/>
+      <stop offset="0.55" stop-color="#031038"/>
+      <stop offset="0.82" stop-color="#061a4a" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#0a2468" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0.6" stop-color="#5cc4f0" stop-opacity="0"/>
+      <stop offset="0.82" stop-color="#5cc4f0" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#5cc4f0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blob" cx="45%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#e6eefc"/>
+      <stop offset="0.75" stop-color="#cbdcf6"/>
+      <stop offset="1" stop-color="#b3caf0"/>
+    </radialGradient>
+    <linearGradient id="sclera" gradientUnits="userSpaceOnUse" x1="0" y1="28" x2="0" y2="70">
+      <stop offset="0" stop-color="#cfd8e6"/>
+      <stop offset="0.5" stop-color="#f4f7fb"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="lashGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#46321a"/>
+      <stop offset="1" stop-color="#2f2010"/>
+    </linearGradient>
+    <clipPath id="irisClip"><ellipse cx="73" cy="73" rx="37" ry="39"/></clipPath>
+  </defs>
+</svg>
+
+<main>
+  <button class="yes" id="yes" type="button">
+    <span class="eyes" aria-hidden="true">
+      <svg class="eye" viewBox="6 12 116 102" data-flip="1" focusable="false">
+        <g class="art">
+          <g>
+            <path d="M119 74 C117.5 72.0 112.8 66.0 110.0 62.0 C107.2 58.0 105.0 53.5 102.0 50.0 C99.0 46.5 95.7 43.5 92.0 41.0 C88.3 38.5 84.0 36.5 80.0 35.0 C76.0 33.5 72.0 32.2 68.0 32.0 C64.0 31.8 60.0 32.7 56.0 34.0 C52.0 35.3 47.8 37.5 44.0 40.0 C40.2 42.5 35.8 46.2 33.0 49.0 C30.2 51.8 28.8 53.5 27.5 57.0 C26.2 60.5 25.3 65.5 25.0 70.0 C24.7 74.5 24.8 79.7 25.5 84.0 C26.2 88.3 27.6 92.5 29.0 96.0 C30.4 99.5 33.2 103.5 34.0 105.0 L48 92 L73 80 L100 80 Z" fill="url(#sclera)"/>
+            <ellipse class="iris" cx="73" cy="73" rx="37" ry="39" fill="url(#irisBase)"/>
+            <g clip-path="url(#irisClip)">
+              <ellipse cx="73" cy="73" rx="37" ry="39" fill="url(#vignette)"/>
+              <ellipse cx="74" cy="101" rx="32" ry="13" fill="url(#glow)"/>
+              <ellipse cx="41" cy="86" rx="12" ry="22" fill="url(#glowSide)"/>
+              <ellipse cx="105" cy="88" rx="8" ry="15" fill="url(#glowSide)" opacity="0.6"/>
+              <rect x="34" y="32" width="78" height="38" fill="url(#lidShade)"/>
+              <g class="detail">
+                <circle cx="73.5" cy="74" r="22" fill="url(#ringGrad)"/>
+                <circle cx="73.5" cy="74" r="19" fill="none" stroke="#6cc0f0" stroke-width="0.8" opacity="0.15"/>
+              </g>
+              <g class="pupil">
+                <ellipse cx="73.5" cy="74" rx="17" ry="18.5" fill="url(#pupilGrad)"/>
+                <ellipse cx="73.5" cy="74.5" rx="4" ry="9.5" fill="#000514" opacity="0.5"/>
+              </g>
+            </g>
+            <ellipse cx="73" cy="73" rx="36.2" ry="38.2" fill="none" stroke="#0a2356" stroke-width="1.3" opacity="0.85"/>
+            <circle cx="63" cy="55" r="5.4" fill="#fff"/>
+            <circle cx="63" cy="55" r="3.2" fill="#d6e6ff" opacity="0.9"/>
+            <ellipse cx="44.7" cy="72.7" rx="2.8" ry="2.3" fill="#fff"/>
+            <ellipse cx="53.3" cy="67" rx="2.8" ry="1.1" fill="#fff" opacity="0.9" transform="rotate(28 53.3 67)"/>
+            <path d="M0 5 C-7 0 -6 -5.5 -2.5 -5 C-1 -4.7 0 -3.5 0 -2.5 C0 -3.5 1.2 -4.8 2.8 -5 C6 -5.3 7 0 0 5Z" transform="translate(90.5 67.5) rotate(-8)" fill="none" stroke="#fff" stroke-width="0.95" stroke-linejoin="round"/>
+            <circle cx="106" cy="78.7" r="4" fill="#38e9d2"/>
+            <ellipse cx="53.7" cy="95.8" rx="8.6" ry="8.3" fill="url(#blob)"/>
+            <path d="M34 105 C33.0 103.7 29.8 100.2 28.0 97.0 C26.2 93.8 24.4 90.2 23.0 86.0 C21.6 81.8 20.4 77.0 19.5 72.0 C18.6 67.0 17.4 61.0 17.5 56.0 C17.6 51.0 17.9 46.5 20.0 42.0 C22.1 37.5 25.8 32.5 30.0 29.0 C34.2 25.5 39.5 22.9 45.0 21.0 C50.5 19.1 57.2 17.8 63.0 17.5 C68.8 17.2 75.0 17.4 80.0 19.0 C85.0 20.6 89.0 23.7 93.0 27.0 C97.0 30.3 100.8 34.5 104.0 39.0 C107.2 43.5 109.5 48.2 112.0 54.0 C114.5 59.8 117.8 70.7 119.0 74.0 C117.5 72.0 112.8 66.0 110.0 62.0 C107.2 58.0 105.0 53.5 102.0 50.0 C99.0 46.5 95.7 43.5 92.0 41.0 C88.3 38.5 84.0 36.5 80.0 35.0 C76.0 33.5 72.0 32.2 68.0 32.0 C64.0 31.8 60.0 32.7 56.0 34.0 C52.0 35.3 47.8 37.5 44.0 40.0 C40.2 42.5 35.8 46.2 33.0 49.0 C30.2 51.8 28.8 53.5 27.5 57.0 C26.2 60.5 25.3 65.5 25.0 70.0 C24.7 74.5 24.8 79.7 25.5 84.0 C26.2 88.3 27.6 92.5 29.0 96.0 C30.4 99.5 33.2 103.5 34.0 105.0 Z" fill="url(#lashGrad)"/>
+            <g fill="#35250f">
+              <path d="M24.5 15.5 L27.6 29 L34 26.5 Z"/>
+              <path d="M8.3 30.8 L17.5 41.5 L21.5 34 Z"/>
+              <path d="M9 52 L18.5 54 L18.5 58.5 Z"/>
+              <path d="M10.5 61 L18 60 L19 66 Z"/>
+            </g>
+            <g stroke="#35250f" stroke-width="0.9" stroke-linecap="round" fill="none">
+              <path d="M26 33 C16 40 12 50 12.5 61"/>
+              <path d="M13 44 L18.5 45.5"/><path d="M12.5 53 L18 53"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+
+      <svg class="eye" viewBox="6 12 116 102" data-flip="-1" focusable="false">
+        <g class="art">
+          <g transform="translate(127 0) scale(-1 1)">
+            <path d="M119 74 C117.5 72.0 112.8 66.0 110.0 62.0 C107.2 58.0 105.0 53.5 102.0 50.0 C99.0 46.5 95.7 43.5 92.0 41.0 C88.3 38.5 84.0 36.5 80.0 35.0 C76.0 33.5 72.0 32.2 68.0 32.0 C64.0 31.8 60.0 32.7 56.0 34.0 C52.0 35.3 47.8 37.5 44.0 40.0 C40.2 42.5 35.8 46.2 33.0 49.0 C30.2 51.8 28.8 53.5 27.5 57.0 C26.2 60.5 25.3 65.5 25.0 70.0 C24.7 74.5 24.8 79.7 25.5 84.0 C26.2 88.3 27.6 92.5 29.0 96.0 C30.4 99.5 33.2 103.5 34.0 105.0 L48 92 L73 80 L100 80 Z" fill="url(#sclera)"/>
+            <ellipse class="iris" cx="73" cy="73" rx="37" ry="39" fill="url(#irisBase)"/>
+            <g clip-path="url(#irisClip)">
+              <ellipse cx="73" cy="73" rx="37" ry="39" fill="url(#vignette)"/>
+              <ellipse cx="74" cy="101" rx="32" ry="13" fill="url(#glow)"/>
+              <ellipse cx="41" cy="86" rx="12" ry="22" fill="url(#glowSide)"/>
+              <ellipse cx="105" cy="88" rx="8" ry="15" fill="url(#glowSide)" opacity="0.6"/>
+              <rect x="34" y="32" width="78" height="38" fill="url(#lidShade)"/>
+              <g class="detail">
+                <circle cx="73.5" cy="74" r="22" fill="url(#ringGrad)"/>
+                <circle cx="73.5" cy="74" r="19" fill="none" stroke="#6cc0f0" stroke-width="0.8" opacity="0.15"/>
+              </g>
+              <g class="pupil">
+                <ellipse cx="73.5" cy="74" rx="17" ry="18.5" fill="url(#pupilGrad)"/>
+                <ellipse cx="73.5" cy="74.5" rx="4" ry="9.5" fill="#000514" opacity="0.5"/>
+              </g>
+            </g>
+            <ellipse cx="73" cy="73" rx="36.2" ry="38.2" fill="none" stroke="#0a2356" stroke-width="1.3" opacity="0.85"/>
+            <circle cx="63" cy="55" r="5.4" fill="#fff"/>
+            <circle cx="63" cy="55" r="3.2" fill="#d6e6ff" opacity="0.9"/>
+            <ellipse cx="44.7" cy="72.7" rx="2.8" ry="2.3" fill="#fff"/>
+            <ellipse cx="53.3" cy="67" rx="2.8" ry="1.1" fill="#fff" opacity="0.9" transform="rotate(28 53.3 67)"/>
+            <path d="M0 5 C-7 0 -6 -5.5 -2.5 -5 C-1 -4.7 0 -3.5 0 -2.5 C0 -3.5 1.2 -4.8 2.8 -5 C6 -5.3 7 0 0 5Z" transform="translate(90.5 67.5) rotate(-8)" fill="none" stroke="#fff" stroke-width="0.95" stroke-linejoin="round"/>
+            <circle cx="106" cy="78.7" r="4" fill="#38e9d2"/>
+            <ellipse cx="53.7" cy="95.8" rx="8.6" ry="8.3" fill="url(#blob)"/>
+            <path d="M34 105 C33.0 103.7 29.8 100.2 28.0 97.0 C26.2 93.8 24.4 90.2 23.0 86.0 C21.6 81.8 20.4 77.0 19.5 72.0 C18.6 67.0 17.4 61.0 17.5 56.0 C17.6 51.0 17.9 46.5 20.0 42.0 C22.1 37.5 25.8 32.5 30.0 29.0 C34.2 25.5 39.5 22.9 45.0 21.0 C50.5 19.1 57.2 17.8 63.0 17.5 C68.8 17.2 75.0 17.4 80.0 19.0 C85.0 20.6 89.0 23.7 93.0 27.0 C97.0 30.3 100.8 34.5 104.0 39.0 C107.2 43.5 109.5 48.2 112.0 54.0 C114.5 59.8 117.8 70.7 119.0 74.0 C117.5 72.0 112.8 66.0 110.0 62.0 C107.2 58.0 105.0 53.5 102.0 50.0 C99.0 46.5 95.7 43.5 92.0 41.0 C88.3 38.5 84.0 36.5 80.0 35.0 C76.0 33.5 72.0 32.2 68.0 32.0 C64.0 31.8 60.0 32.7 56.0 34.0 C52.0 35.3 47.8 37.5 44.0 40.0 C40.2 42.5 35.8 46.2 33.0 49.0 C30.2 51.8 28.8 53.5 27.5 57.0 C26.2 60.5 25.3 65.5 25.0 70.0 C24.7 74.5 24.8 79.7 25.5 84.0 C26.2 88.3 27.6 92.5 29.0 96.0 C30.4 99.5 33.2 103.5 34.0 105.0 Z" fill="url(#lashGrad)"/>
+            <g fill="#35250f">
+              <path d="M24.5 15.5 L27.6 29 L34 26.5 Z"/>
+              <path d="M8.3 30.8 L17.5 41.5 L21.5 34 Z"/>
+              <path d="M9 52 L18.5 54 L18.5 58.5 Z"/>
+              <path d="M10.5 61 L18 60 L19 66 Z"/>
+            </g>
+            <g stroke="#35250f" stroke-width="0.9" stroke-linecap="round" fill="none">
+              <path d="M26 33 C16 40 12 50 12.5 61"/>
+              <path d="M13 44 L18.5 45.5"/><path d="M12.5 53 L18 53"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+
+    </span>
+    <span class="label">Yes</span>
+  </button>
+  <p class="hint">Move your cursor over the button, or touch and drag on it.</p>
+</main>
+
+<script>
+(function () {
+  var btn = document.getElementById('yes');
+  var MAX = 11;          // max pupil travel in SVG units; keeps the pupil well inside the iris (r = 36)
+  var DETAIL = 0.45;     // iris glow shifts less than the pupil for a little depth
+  var FALLOFF = 110;     // px distance at which the pupil reaches full travel
+  var YSCALE = 0.85;     // vertical travel is a touch shorter, like a real eye
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  var eyes = Array.prototype.map.call(btn.querySelectorAll('.eye'), function (svg) {
+    return {
+      svg: svg, flip: Number(svg.dataset.flip) || 1, iris: svg.querySelector('.iris'), pupil: svg.querySelector('.pupil'), detail: svg.querySelector('.detail'),
+      x: 0, y: 0, tx: 0, ty: 0, cx: 0, cy: 0
+    };
+  });
+
+  var px = 0, py = 0, active = false, dirty = true, running = false, last = 0, releaseTimer = 0;
+
+  function measure() {
+    eyes.forEach(function (e) {
+      var r = e.iris.getBoundingClientRect();
+      e.cx = r.left + r.width * 0.5;
+      e.cy = r.top + r.height * 0.5;
+    });
+  }
+
+  function aim() {
+    eyes.forEach(function (e) {
+      if (!active) { e.tx = 0; e.ty = 0; return; }
+      var dx = px - e.cx, dy = py - e.cy;
+      var d = Math.hypot(dx, dy) || 1;
+      var s = Math.min(1, d / FALLOFF);
+      s = s * (2 - s);                        // ease-out so small cursor moves still read
+      var r = MAX * s;
+      e.tx = (dx / d) * r;
+      e.ty = (dy / d) * r * YSCALE;
+    });
+  }
+
+  function frame(t) {
+    var dt = Math.min(0.05, (t - last) / 1000 || 0.016);
+    last = t;
+    if (dirty) { measure(); dirty = false; }
+    aim();
+    var k = reduce.matches ? 40 : (active ? 13 : 7);
+    var a = 1 - Math.exp(-k * dt);            // frame-rate independent easing
+    var moving = false;
+    eyes.forEach(function (e) {
+      e.x += (e.tx - e.x) * a;
+      e.y += (e.ty - e.y) * a;
+      if (Math.abs(e.tx - e.x) < 0.01 && Math.abs(e.ty - e.y) < 0.01) { e.x = e.tx; e.y = e.ty; }
+      else moving = true;
+      e.pupil.setAttribute('transform', 'translate(' + (e.x * e.flip).toFixed(2) + ' ' + e.y.toFixed(2) + ')');
+      e.detail.setAttribute('transform', 'translate(' + (e.x * e.flip * DETAIL).toFixed(2) + ' ' + (e.y * DETAIL).toFixed(2) + ')');
+    });
+    if (moving) requestAnimationFrame(frame); else running = false;
+  }
+
+  function kick() {
+    if (running) return;
+    running = true;
+    last = performance.now();
+    requestAnimationFrame(frame);
+  }
+
+  function release() { active = false; kick(); }
+
+  btn.addEventListener('pointerenter', function (e) {
+    clearTimeout(releaseTimer);
+    active = true; dirty = true; px = e.clientX; py = e.clientY; kick();
+  });
+  btn.addEventListener('pointermove', function (e) {
+    clearTimeout(releaseTimer);
+    active = true; px = e.clientX; py = e.clientY; kick();
+  });
+  btn.addEventListener('pointerleave', function (e) {
+    clearTimeout(releaseTimer);
+    if (e.pointerType === 'touch') releaseTimer = setTimeout(release, 650);  // let a tap's gaze linger
+    else release();
+  });
+  btn.addEventListener('pointercancel', release);
+
+  btn.addEventListener('click', function () {
+    btn.classList.remove('blink');
+    void btn.offsetWidth;
+    btn.classList.add('blink');
+  });
+  btn.addEventListener('animationend', function () { btn.classList.remove('blink'); });
+
+  function invalidate() { dirty = true; if (active) kick(); }
+  window.addEventListener('resize', invalidate);
+  window.addEventListener('scroll', invalidate, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(invalidate).observe(btn);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(invalidate);
+})();
+</script>
+
+</body></html>

@@ -10,7 +10,8 @@ export const authLimiter = rateLimit({
 
 export const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 120,
+  // Private gift gallery — allow large WhatsApp import batches
+  max: 5000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many upload requests" },

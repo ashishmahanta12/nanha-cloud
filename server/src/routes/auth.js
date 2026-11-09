@@ -20,7 +20,11 @@ router.post(
 
     // Ensure access code is also represented as an Invite for audit if desired
     if (result.via === "access_code" && env.GALLERY_ACCESS_CODE) {
-      await ensureSeedInvite(env.GALLERY_ACCESS_CODE, result.galleryId);
+      try {
+        await ensureSeedInvite(env.GALLERY_ACCESS_CODE, result.galleryId);
+      } catch (err) {
+        console.warn("[nanha-cloud] seed invite skipped:", err.message);
+      }
     }
 
     const token = signSession({ galleryId: result.galleryId });
@@ -41,7 +45,7 @@ router.get(
 );
 
 router.post("/logout", (_req, res) => {
-  res.clearCookie(env.COOKIE_NAME, { path: "/" });
+  res.clearCookie(env.COOKIE_NAME, sessionCookieOptions());
   res.json({ ok: true });
 });
 

@@ -48,6 +48,7 @@ describe("quota", () => {
     expect(q.total).toBe(16106127360);
     expect(q.used).toBe(1073741824);
     expect(q.available).toBe(16106127360 - 1073741824);
+    expect(q.unlimited).toBe(false);
     expect(q.usedByApp).toBe(1000);
     expect(q.breakdown.gif).toBe(1000);
   });

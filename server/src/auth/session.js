@@ -17,10 +17,12 @@ export function verifySession(token) {
 
 export function sessionCookieOptions() {
   const maxAge = env.COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
+  const sameSite = env.COOKIE_SAMESITE === "none" ? "none" : "lax";
   return {
     httpOnly: true,
-    sameSite: "lax",
-    secure: env.NODE_ENV === "production",
+    sameSite,
+    // SameSite=None requires Secure; always secure in production
+    secure: env.NODE_ENV === "production" || sameSite === "none",
     maxAge,
     path: "/",
   };

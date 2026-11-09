@@ -16,6 +16,7 @@ const uploadSessionSchema = new mongoose.Schema(
     totalBytes: { type: Number, required: true },
     bytesReceived: { type: Number, default: 0 },
     checksum: { type: String, default: null },
+    capturedAt: { type: Date, default: null },
     status: {
       type: String,
       enum: ["in_progress", "completed", "aborted"],

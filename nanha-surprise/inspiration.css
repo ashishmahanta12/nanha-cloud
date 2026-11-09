@@ -1,0 +1,1063 @@
+/* Inspiration.html design system — shared across all screens */
+:root {
+  --insp-shadow-glass: 0 12px 40px rgba(102, 70, 44, 0.08), 0 2px 8px rgba(102, 70, 44, 0.04);
+  --insp-shadow-soft: 0 8px 24px rgba(102, 70, 44, 0.06);
+  --insp-radius-card: 28px;
+}
+
+.font-script { font-family: "Caveat", "Dancing Script", cursive; }
+.font-romantic { font-family: "Dancing Script", cursive; }
+
+.glass-card {
+  /* Near-opaque frost — no backdrop-filter (re-blurring spinning ambient = cursor lag) */
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: var(--insp-shadow-glass);
+  border-radius: var(--insp-radius-card);
+}
+
+.glass-card-warm {
+  background: rgba(255, 252, 248, 0.95);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(230, 218, 206, 0.6);
+  box-shadow: var(--insp-shadow-soft);
+  border-radius: 22px;
+}
+
+/* Align leftover btn-nanha* with nanha-gift button look */
+button.btn-nanha,
+button.btn-nanha-primary {
+  position: relative;
+  overflow: hidden;
+  min-height: 50px;
+  padding: 0.75em 1.6em;
+  border-radius: 999px !important;
+  border: 2px solid #fff !important;
+  color: #4a2c20 !important;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 12px 30px -10px rgba(122, 84, 64, 0.22), 0 2px 8px rgba(122, 84, 64, 0.07);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, filter 0.3s;
+}
+button.btn-nanha {
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+button.btn-nanha-primary {
+  background: linear-gradient(135deg, #ffb3cc 0%, #ffcfa8 100%) !important;
+  box-shadow: 0 14px 34px -8px rgba(255, 143, 179, 0.55), 0 3px 8px rgba(122, 84, 64, 0.1);
+}
+button.btn-nanha:hover,
+button.btn-nanha-primary:hover {
+  box-shadow: 0 16px 30px -10px rgba(255, 143, 179, 0.55), 0 0 18px rgba(255, 200, 225, 0.7);
+  filter: brightness(1.03);
+  transform: none;
+}
+button.btn-nanha:active,
+button.btn-nanha-primary:active { transform: scale(0.93, 0.88); }
+
+@keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes spinReverseSlow { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+.animate-spin-slow {
+  animation: spinSlow 90s linear infinite;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+.animate-spin-reverse-slow {
+  animation: spinReverseSlow 110s linear infinite;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -12px, 0) rotate(3deg); }
+}
+.animate-float {
+  animation: floatGentle 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  backface-visibility: hidden;
+}
+.animate-float-delayed {
+  animation: floatGentle 6.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite 2.1s;
+  backface-visibility: hidden;
+}
+
+@keyframes pulseSoft {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+.animate-pulse-soft { animation: pulseSoft 3s ease-in-out infinite; }
+
+@keyframes shakeNanha {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px) rotate(-1deg); }
+  40%, 80% { transform: translateX(8px) rotate(1deg); }
+}
+.shake-card { animation: shakeNanha 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+.nanha-sparkle-trail {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 14px;
+  z-index: 1;
+  margin: 0;
+  line-height: 1;
+  opacity: 0.9;
+  /* Position via JS translate3d only — never animate left/top */
+  transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+  text-shadow: 0 1px 4px rgba(102, 70, 44, 0.1);
+  contain: layout style;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  animation: none !important; /* WAAPI owns the fade — avoid double animation */
+}
+
+@keyframes blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+.blinking-eye {
+  animation: blink 4s infinite;
+  transform-origin: center;
+}
+
+.envelope-shadow {
+  filter: drop-shadow(0 20px 30px rgba(102, 70, 44, 0.15));
+}
+
+/* ---- App credit footer (subtle, Inspiration-aligned) ---- */
+.app-credit {
+  position: fixed;
+  left: 0;
+  right: auto;
+  bottom: 0;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: none;
+  padding: 1rem 1.25rem calc(1.15rem + env(safe-area-inset-bottom, 0px));
+  padding-left: calc(1.5rem + env(safe-area-inset-left, 0px));
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+.app-credit-line {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  font-family: "Quicksand", "Nunito", sans-serif;
+  font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #6b5344;
+  opacity: 1;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.app-credit-heart {
+  flex-shrink: 0;
+  width: 1.05em;
+  height: 1.05em;
+  color: #ea7d9a;
+  filter: drop-shadow(0 1px 3px rgba(234, 125, 154, 0.4));
+  transform-origin: center;
+  animation: app-credit-heartbeat 1.35s ease-in-out infinite;
+}
+@keyframes app-credit-heartbeat {
+  0%, 100% { transform: translateY(0.5px) scale(1); }
+  14% { transform: translateY(0.5px) scale(1.22); }
+  28% { transform: translateY(0.5px) scale(1); }
+  42% { transform: translateY(0.5px) scale(1.14); }
+  56% { transform: translateY(0.5px) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-credit-heart { animation: none; transform: translateY(0.5px); }
+}
+#loader:not(.done) ~ .app-credit {
+  opacity: 0;
+  visibility: hidden;
+}
+body:has(.lightbox:not([hidden])) .app-credit,
+body:has(.cloud-preview:not([hidden])) .app-credit,
+body:has(.cloud-busy:not([hidden])) .app-credit {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Inspiration layout host — match gate: centered cards, not left-stretched */
+.screen .screen-inner.insp-inner {
+  width: 100% !important;
+  max-width: 56rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  padding: 0.25rem 0 2rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Direct glass cards stay centered even when narrower than host */
+.screen .screen-inner.insp-inner > .glass-card,
+.screen .screen-inner.insp-inner > .w-full,
+.screen .screen-inner.insp-inner > .bday-card-wrap {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  flex-shrink: 0;
+}
+
+/* Post-gate screens: same horizontal padding rhythm as Inspiration/gate */
+.screen:not([data-screen="gallery"]) {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.screen.active:not([data-screen="gallery"]) {
+  filter: none !important;
+}
+
+.screen[data-screen="gate"] {
+  padding: 1.25rem 1rem 8rem !important;
+  background: transparent !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.screen[data-screen="gate"] .screen-inner {
+  width: min(100%, 680px) !important;
+  max-width: 680px !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.screen[data-screen="gate"].active,
+.screen[data-screen="gate"].from-loader {
+  filter: none !important;
+  transform: none !important;
+}
+
+/*
+  .screen is flex-direction:row by default:
+  - justify-content = horizontal
+  - align-items = vertical
+*/
+.screen[data-screen="birthday"],
+.screen[data-screen="baby"],
+.screen[data-screen="memories"],
+.screen[data-screen="letter"],
+.screen[data-screen="quiz"] {
+  justify-content: center !important;
+  align-items: flex-start !important; /* tall cards start under chrome, not clipped */
+}
+
+/* Baby: full-bleed content, no outer glass card */
+.screen[data-screen="baby"] .screen-inner.insp-inner,
+.screen[data-screen="baby"] .baby-inner,
+.screen[data-screen="baby"] .screen-inner.wide {
+  width: min(100%, 980px) !important;
+  max-width: min(100%, 980px) !important;
+}
+.screen[data-screen="baby"] .screen-inner.insp-inner > .w-full,
+.screen[data-screen="baby"] .screen-inner.insp-inner > .baby-card {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.screen[data-screen="gift"] {
+  justify-content: center !important;
+  align-items: flex-start !important;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  /* Clear fixed brand/music chrome so eyebrow + title stay readable */
+  padding-top: calc(3.5rem + var(--safe-t)) !important;
+}
+.screen[data-screen="gift"] .gift-inner {
+  margin: 0 auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  justify-content: flex-start !important;
+}
+.screen[data-screen="admire"] {
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+.screen[data-screen="year"] {
+  justify-content: center !important;
+  align-items: center !important; /* short cards vertically centered */
+}
+.screen[data-screen="final"] {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  overflow-y: auto !important;
+}
+.screen[data-screen="dive"] {
+  justify-content: stretch !important;
+  align-items: stretch !important;
+}
+
+/* Gallery chrome aligned to Inspiration glass */
+.screen-photos .photos-header {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: var(--insp-shadow-glass);
+  border-radius: var(--insp-radius-card);
+  padding: 1.25rem 1.25rem 1rem;
+}
+.screen-photos .photos-title {
+  font-family: "Dancing Script", cursive;
+  color: #66462c;
+}
+.screen-photos .photos-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8c7565;
+}
+.screen-photos .photos-upload-btn,
+.screen-photos .cloud-chip.is-active {
+  background: linear-gradient(135deg, #fff0f4 0%, #f5e6ff 50%, #ffefe6 100%);
+  color: #66462c;
+  border: 1.5px solid rgba(102, 70, 44, 0.15);
+}
+.screen-photos .photos-back {
+  background: linear-gradient(135deg, #fff0f4 0%, #f5e6ff 50%, #ffefe6 100%) !important;
+  color: #66462c !important;
+  border: 1.5px solid rgba(102, 70, 44, 0.15) !important;
+}
+
+/* Baby polaroid curtain fills the photo well */
+#baby-curtain.curtain {
+  inset: 0 !important;
+  border-radius: 0.75rem;
+}
+
+/* Letter — gift envelope/paper (layout tweaks live in style.css) */
+
+/* Meet playground positioning for escaping NO */
+#meet-area.insp-playground {
+  position: relative;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#no-btn.insp-no {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow,
+  .animate-spin-reverse-slow,
+  .animate-float,
+  .animate-float-delayed,
+  .animate-pulse-soft,
+  .blinking-eye {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   Desktop viewport fit — one composition per screen, no clip
+   Scales padding / type / media with available height.
+   List screens (memories, gallery) keep internal scroll; admire stays viewport-fit.
+   ========================================================= */
+@media (min-width: 768px) {
+  :root {
+    /* Must clear fixed brand/music chrome */
+    --desk-chrome-top: clamp(4.85rem, 9.5vh, 5.75rem);
+    /* Reserve room for fixed credit footer without forcing page scroll */
+    --desk-chrome-bot: clamp(2.35rem, 4.2vh, 3rem);
+    --desk-card-pad-y: clamp(0.7rem, 2.2vh, 2rem);
+    --desk-card-pad-x: clamp(1rem, 2.4vw, 2.5rem);
+    --desk-gap: clamp(0.35rem, 1.2vh, 1rem);
+  }
+
+  .screen:not([data-screen="gallery"]) {
+    padding-top: calc(var(--desk-chrome-top) + var(--safe-t)) !important;
+    padding-bottom: calc(var(--desk-chrome-bot) + var(--safe-b)) !important;
+    padding-left: clamp(1rem, 3vw, 2rem) !important;
+    padding-right: clamp(1rem, 3vw, 2rem) !important;
+  }
+
+  /* Center short/story cards in the remaining viewport */
+  .screen[data-screen="gate"],
+  .screen[data-screen="birthday"],
+  .screen[data-screen="year"],
+  .screen[data-screen="baby"],
+  .screen[data-screen="dive"],
+  .screen[data-screen="letter"],
+  .screen[data-screen="quiz"],
+  .screen[data-screen="gift"],
+  .screen[data-screen="final"] {
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .screen[data-screen="dive"],
+  .screen[data-screen="gift"] {
+    overflow: hidden !important; /* gift + dive stay locked to one viewport */
+  }
+  .screen[data-screen="gift"] {
+    align-items: flex-start !important;
+    /* Sit eyebrow/title just under chrome — do not collapse to 1rem */
+    padding-top: calc(var(--desk-chrome-top) + var(--safe-t)) !important;
+  }
+  /* Box centers in leftover space under the title (see style.css flex:1) */
+  .screen[data-screen="gift"] .gift-stage {
+    margin-top: clamp(0.5rem, 1.5vh, 1rem) !important;
+  }
+  .screen[data-screen="gift"] .gift-inner {
+    margin: 0 auto !important;
+    height: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .screen .screen-inner.insp-inner {
+    max-height: calc(100dvh - var(--desk-chrome-top) - var(--desk-chrome-bot) - var(--safe-t) - var(--safe-b));
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+
+  .screen .screen-inner.insp-inner > .glass-card,
+  .screen .screen-inner.insp-inner > .w-full.glass-card,
+  .screen .screen-inner.insp-inner > .w-full {
+    width: 100%;
+    max-width: min(42rem, 100%);
+    padding: var(--desk-card-pad-y) var(--desk-card-pad-x) !important;
+    box-sizing: border-box;
+  }
+  .screen .screen-inner.insp-inner > .bday-card-wrap {
+    width: 100%;
+    max-width: min(42rem, 100%);
+    box-sizing: border-box;
+  }
+  .screen .screen-inner.insp-inner > .bday-card-wrap > .glass-card {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--desk-card-pad-y) var(--desk-card-pad-x) !important;
+    box-sizing: border-box;
+  }
+
+  .screen[data-screen="memories"] .screen-inner.insp-inner > .w-full,
+  .screen[data-screen="admire"] .screen-inner.insp-inner > .w-full {
+    max-width: min(48rem, 100%);
+  }
+
+  /* ---- Gate (nanha-gift lock / pills — light desktop tweak only) ---- */
+  .screen[data-screen="gate"] .gate-card {
+    padding: 34px 40px !important;
+  }
+  .screen[data-screen="gate"] .gate-q {
+    font-size: clamp(1.85rem, 4.2vh, 3.2rem) !important;
+  }
+
+  /* ---- Birthday (tallest story card) ---- */
+  .screen[data-screen="birthday"] .screen-inner.insp-inner > .w-full,
+  .screen[data-screen="birthday"] .screen-inner.insp-inner > .bday-card-wrap {
+    max-width: min(40rem, 100%);
+  }
+  .screen[data-screen="birthday"] #bday-title {
+    font-size: clamp(1.85rem, 5vh, 3.4rem) !important;
+    margin-bottom: var(--desk-gap) !important;
+    line-height: 1.15 !important;
+  }
+  .screen[data-screen="birthday"] #bday-quote {
+    font-size: clamp(1.15rem, 2.8vh, 1.75rem) !important;
+    margin-bottom: clamp(0.5rem, 1.6vh, 1.25rem) !important;
+    line-height: 1.3 !important;
+  }
+  .screen[data-screen="birthday"] #cake-card {
+    padding: clamp(0.55rem, 1.6vh, 1.5rem) clamp(0.75rem, 2vw, 1.5rem) !important;
+    margin-bottom: clamp(0.5rem, 1.6vh, 1.5rem) !important;
+  }
+  .screen[data-screen="birthday"] #cake-status {
+    font-size: clamp(0.95rem, 2.2vh, 1.25rem) !important;
+    min-height: 1.2rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+  .screen[data-screen="birthday"] #cake-stage {
+    margin-top: clamp(0.15rem, 0.8vh, 0.65rem) !important;
+    margin-bottom: clamp(0.15rem, 0.8vh, 0.65rem) !important;
+    gap: clamp(0.5rem, 2vw, 2rem) !important;
+  }
+  .screen[data-screen="birthday"] .nanha-cake {
+    --cake-w: clamp(132px, 18vh, 190px);
+    min-width: 120px;
+  }
+  .screen[data-screen="birthday"] .cake-scene {
+    height: clamp(112px, 17vh, 158px);
+  }
+  .screen[data-screen="birthday"] .realistic-cake-svg {
+    max-height: clamp(112px, 17vh, 158px);
+  }
+  .screen[data-screen="birthday"] .cake-char-avatar {
+    width: clamp(5.5rem, 14vh, 9rem) !important;
+    height: clamp(6.75rem, 17vh, 11rem) !important;
+  }
+  .screen[data-screen="birthday"] #cake-finale {
+    font-size: clamp(1rem, 2.4vh, 1.35rem) !important;
+    margin-top: clamp(0.25rem, 0.8vh, 0.65rem) !important;
+  }
+  .screen[data-screen="birthday"] #cut-cake-btn {
+    margin-top: clamp(0.35rem, 1vh, 0.85rem) !important;
+    padding-top: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+  }
+  .screen[data-screen="birthday"] .next-btn {
+    padding-top: clamp(0.55rem, 1.3vh, 0.85rem) !important;
+    padding-bottom: clamp(0.55rem, 1.3vh, 0.85rem) !important;
+  }
+
+  /* ---- Year ---- */
+  .screen[data-screen="year"] {
+    padding-left: clamp(1.5rem, 4vw, 2.75rem) !important;
+    padding-right: clamp(1.5rem, 4vw, 2.75rem) !important;
+  }
+  .screen[data-screen="year"] .screen-inner.insp-inner {
+    width: min(38rem, 100%) !important;
+    max-width: min(38rem, 100%) !important;
+    padding: 0.85rem 0.5rem 1.25rem !important;
+  }
+  .screen[data-screen="year"] .screen-inner.insp-inner > .year-card.w-full,
+  .screen[data-screen="year"] .screen-inner.insp-inner > .year-card.glass-card {
+    max-width: 100% !important;
+    padding: clamp(1.55rem, 3.1vh, 2.4rem) clamp(1.55rem, 3vw, 2.6rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-badge {
+    margin-bottom: clamp(0.75rem, 1.7vh, 1.1rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-title,
+  .screen[data-screen="year"] .screen-inner.insp-inner > .year-card h2 {
+    font-size: clamp(1.65rem, 4vh, 2.7rem) !important;
+    margin-bottom: clamp(0.7rem, 1.7vh, 1.15rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-flight {
+    margin-top: clamp(0.65rem, 1.7vh, 1.15rem) !important;
+    margin-bottom: clamp(0.65rem, 1.7vh, 1.15rem) !important;
+    padding-top: clamp(0.4rem, 1.1vh, 0.85rem) !important;
+    padding-bottom: clamp(0.4rem, 1.1vh, 0.85rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-flight #flight-svg,
+  .screen[data-screen="year"] .year-card-flight svg {
+    max-height: clamp(10rem, 27vh, 13.5rem) !important;
+    width: min(100%, 34rem) !important;
+  }
+  .screen[data-screen="year"] #year-quote,
+  .screen[data-screen="year"] .year-card-quote {
+    font-size: clamp(1.15rem, 2.7vh, 1.7rem) !important;
+    margin-top: clamp(0.55rem, 1.5vh, 0.95rem) !important;
+    margin-bottom: clamp(0.5rem, 1.4vh, 0.9rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-body {
+    margin-bottom: clamp(1.15rem, 2.5vh, 1.75rem) !important;
+  }
+
+  /* ---- Baby (full-bleed, no outer card) ---- */
+  .screen[data-screen="baby"] {
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+    padding-top: calc(4.85rem + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px)) !important;
+    scroll-padding-top: calc(4.85rem + env(safe-area-inset-top, 0px)) !important;
+    scroll-padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .screen[data-screen="baby"] .screen-inner.insp-inner,
+  .screen[data-screen="baby"] .baby-inner,
+  .screen[data-screen="baby"] .screen-inner.wide {
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: min(100%, 1120px) !important;
+    max-width: min(100%, 1120px) !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0.35rem 0 2rem !important;
+  }
+  .screen[data-screen="baby"] .screen-inner.insp-inner > .w-full,
+  .screen[data-screen="baby"] .screen-inner.insp-inner > .baby-card {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0.35rem 0 2rem !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+  }
+  .screen[data-screen="baby"] .screen-inner.insp-inner > .w-full h2 {
+    font-size: clamp(1.7rem, 4.2vh, 2.85rem) !important;
+    margin-top: var(--desk-gap) !important;
+    margin-bottom: var(--desk-gap) !important;
+  }
+  .screen[data-screen="baby"] #baby-frame {
+    width: min(29rem, 52vh) !important;
+    margin-top: clamp(0.25rem, 0.8vh, 0.65rem) !important;
+    margin-bottom: clamp(1.15rem, 2.8vh, 1.85rem) !important;
+    padding: clamp(0.45rem, 1vh, 0.7rem) !important;
+    padding-bottom: clamp(0.55rem, 1.2vh, 0.9rem) !important;
+  }
+  .screen[data-screen="baby"] #baby-frame .baby-photo {
+    width: auto !important;
+    height: auto !important;
+    max-height: clamp(9rem, 24vh, 13.5rem);
+  }
+  .screen[data-screen="baby"] .baby-side-date {
+    font-size: clamp(1rem, 2.6vh, 1.3rem) !important;
+  }
+  .screen[data-screen="baby"] .baby-side-name {
+    font-size: clamp(0.9rem, 2.4vh, 1.1rem) !important;
+  }
+  .screen[data-screen="baby"] .baby-side-note {
+    font-size: clamp(0.62rem, 1.5vh, 0.72rem) !important;
+  }
+  .screen[data-screen="baby"] #baby-caption {
+    font-size: clamp(0.95rem, 2.1vh, 1.2rem) !important;
+    margin-top: 0.45rem !important;
+  }
+  .screen[data-screen="baby"] .baby-scrap-divider {
+    margin-bottom: clamp(0.95rem, 2.2vh, 1.45rem) !important;
+  }
+  .screen[data-screen="baby"] .baby-facts-wrap {
+    margin-top: clamp(0.2rem, 0.8vh, 0.55rem) !important;
+    max-width: 52rem !important;
+  }
+  .screen[data-screen="baby"] .baby-facts-title {
+    font-size: clamp(1.65rem, 3.8vh, 2.25rem) !important;
+  }
+  .screen[data-screen="baby"] .baby-facts-intro {
+    font-size: clamp(0.82rem, 1.8vh, 0.92rem) !important;
+    color: #6f5748 !important;
+  }
+  .screen[data-screen="baby"] .baby-cta {
+    margin-top: clamp(1.25rem, 2.6vh, 1.9rem) !important;
+  }
+  .screen[data-screen="baby"] .baby-facts-grid,
+  .screen[data-screen="baby"] #facts {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: clamp(0.7rem, 1.4vh, 1rem) clamp(0.8rem, 1.5vh, 1.1rem) !important;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+  .screen[data-screen="baby"] #facts > .baby-fact:last-child:nth-child(odd):not([hidden]) {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: calc((100% - clamp(0.8rem, 1.5vh, 1.1rem)) / 2);
+    justify-self: center;
+  }
+  .screen[data-screen="baby"] .baby-fact-body {
+    font-size: clamp(0.84rem, 1.85vh, 0.92rem) !important;
+    color: #6f5748 !important;
+  }
+  .screen[data-screen="baby"] .baby-outro-text {
+    font-size: clamp(1.05rem, 2.4vh, 1.3rem) !important;
+  }
+
+  /* ---- Dive (full-bleed water) ---- */
+  .screen[data-screen="dive"] {
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  .screen[data-screen="dive"] #dive-text {
+    top: 18% !important;
+    font-size: clamp(2.1rem, 5.5vh, 3.4rem) !important;
+    margin: 0 !important;
+  }
+
+  /* ---- Letter (gift paper) ---- */
+  .screen[data-screen="letter"] {
+    align-items: center !important;
+  }
+  .screen[data-screen="letter"] .env-scene {
+    width: min(70vw, 380px);
+  }
+  .screen[data-screen="letter"] .paper-scroll {
+    max-height: min(58vh, 520px);
+  }
+
+  /* ---- Quiz (gift lockbox) ---- */
+  .screen[data-screen="quiz"] {
+    align-items: center !important;
+  }
+  .screen[data-screen="quiz"] .lockbox {
+    width: clamp(120px, 18vh, 150px);
+  }
+
+  /* ---- Gift (open box + celebrate) ---- */
+  .screen[data-screen="gift"] {
+    align-items: flex-start !important;
+    overflow: hidden !important;
+  }
+  .screen[data-screen="gift"] .bigbox {
+    width: min(36vw, 190px);
+  }
+  .screen[data-screen="gift"] .gift-polaroid {
+    width: min(42vw, 320px);
+  }
+  .screen[data-screen="gift"] .gift-text {
+    font-size: clamp(1.25rem, 3.2vh, 1.7rem) !important;
+  }
+
+  /* ---- Final (gift lanterns) ---- */
+  .screen[data-screen="final"] {
+    align-items: center !important;
+    justify-content: flex-start !important;
+    overflow-y: auto !important;
+  }
+  .screen[data-screen="final"] #final-title {
+    font-size: clamp(1.85rem, 5vh, 3.1rem) !important;
+  }
+  .screen[data-screen="final"] #final-quote,
+  .screen[data-screen="final"] .final-quote,
+  .screen[data-screen="final"] #final-quote p {
+    /* Slightly under 2× — still large, easier to read */
+    font-size: clamp(1.85rem, 4.9vh, 2.35rem) !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Memories: gift-wide timeline placement */
+  .screen[data-screen="memories"] {
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+  }
+  .screen[data-screen="memories"] .screen-inner.insp-inner,
+  .screen[data-screen="memories"] .mem-inner,
+  .screen[data-screen="memories"] .screen-inner.wide {
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: min(100%, 980px) !important;
+    max-width: min(100%, 980px) !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: 16px !important;
+    padding-bottom: 12px !important;
+  }
+  .screen[data-screen="memories"] #mem-title {
+    font-size: clamp(2rem, 8.6vw, 3.6rem) !important;
+    line-height: 1.12 !important;
+  }
+  .screen[data-screen="memories"] #timeline {
+    margin-top: 14px !important;
+    margin-bottom: 6px !important;
+  }
+  .screen[data-screen="memories"] .tl-card {
+    padding: 22px clamp(16px, 4vw, 30px) !important;
+  }
+  .screen[data-screen="memories"] .tl-card h3 {
+    font-size: 1.5rem !important;
+  }
+  .screen[data-screen="memories"] .tl-card p {
+    font-size: 0.98rem !important;
+  }
+
+  /* Admire: single-viewport flower (no page scroll) */
+  .screen[data-screen="admire"] {
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  .screen[data-screen="admire"] .admire-inner {
+    justify-content: center !important;
+    width: min(100%, 640px) !important;
+    max-width: min(100%, 640px) !important;
+    max-height: calc(100dvh - var(--desk-chrome-top) - var(--desk-chrome-bot) - var(--safe-t) - var(--safe-b)) !important;
+    height: calc(100dvh - var(--desk-chrome-top) - var(--desk-chrome-bot) - var(--safe-t) - var(--safe-b));
+    overflow: hidden !important;
+    gap: clamp(0.4rem, 1.2vh, 0.85rem) !important;
+    padding-bottom: 0 !important;
+  }
+  .screen[data-screen="admire"] #adm-title {
+    font-size: clamp(1.7rem, 5vh, 2.9rem) !important;
+  }
+  .screen[data-screen="admire"] .flower {
+    width: min(30vh, 230px) !important;
+    margin: 0 auto !important;
+  }
+  .screen[data-screen="admire"] .reason {
+    min-height: 0 !important;
+    max-height: min(36vh, 270px) !important;
+    padding: clamp(0.95rem, 1.9vh, 1.35rem) clamp(1.1rem, 2.6vw, 1.7rem) !important;
+  }
+  .screen[data-screen="admire"] .reason h3 {
+    font-size: clamp(1.45rem, 3.4vh, 1.85rem) !important;
+  }
+  .screen[data-screen="admire"] .reason p {
+    font-size: clamp(0.98rem, 2.2vh, 1.08rem) !important;
+    line-height: 1.55 !important;
+  }
+  .screen[data-screen="admire"] #admire-next {
+    margin-top: clamp(0.9rem, 2.2vh, 1.4rem) !important;
+  }
+
+  /* After flower bloom the CTA appears — keep header below the tracker */
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) {
+    justify-content: flex-start !important;
+    gap: clamp(0.3rem, 1vh, 0.7rem) !important;
+    padding-top: 0.15rem !important;
+  }
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) .flower {
+    width: min(26vh, 200px) !important;
+  }
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) .reason {
+    max-height: min(30vh, 220px) !important;
+  }
+}
+
+/* Extra-short desktop heights (laptops ~700–800px) */
+@media (min-width: 768px) and (max-height: 820px) {
+  :root {
+    --desk-chrome-top: 4.55rem;
+    --desk-chrome-bot: 2rem;
+    --desk-card-pad-y: clamp(0.55rem, 1.6vh, 1.15rem);
+    --desk-card-pad-x: clamp(0.9rem, 2vw, 1.75rem);
+    --desk-gap: clamp(0.25rem, 0.9vh, 0.65rem);
+  }
+  .app-credit {
+    padding-top: 0.75rem;
+    padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(1.25rem + env(safe-area-inset-left, 0px));
+  }
+  .app-credit-line {
+    font-size: 0.92rem;
+  }
+
+  /* Story cards: shrink media before scrolling the page shell */
+  .screen[data-screen="gate"] .screen-inner.insp-inner,
+  .screen[data-screen="birthday"] .screen-inner.insp-inner,
+  .screen[data-screen="year"] .screen-inner.insp-inner,
+  .screen[data-screen="quiz"] .screen-inner.insp-inner {
+    overflow: hidden !important;
+    min-height: 0;
+  }
+  .screen[data-screen="birthday"] .bday-card-wrap,
+  .screen[data-screen="birthday"] .bday-card-wrap > .glass-card,
+  .screen[data-screen="year"] .year-card {
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+  }
+  .screen[data-screen="birthday"] .screen-inner.insp-inner > .w-full > .inline-flex,
+  .screen[data-screen="birthday"] .bday-card-wrap > .glass-card > .inline-flex {
+    margin-bottom: 0.35rem !important;
+    padding-top: 0.2rem !important;
+    padding-bottom: 0.2rem !important;
+  }
+  .screen[data-screen="birthday"] #bday-title {
+    font-size: clamp(1.55rem, 4.2vh, 2.55rem) !important;
+    margin-bottom: 0.35rem !important;
+  }
+  .screen[data-screen="birthday"] #bday-quote {
+    font-size: clamp(1rem, 2.4vh, 1.45rem) !important;
+    margin-bottom: 0.45rem !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .screen[data-screen="birthday"] #cake-card {
+    margin-bottom: 0.45rem !important;
+    padding: clamp(0.4rem, 1.2vh, 0.85rem) clamp(0.55rem, 1.6vw, 1rem) !important;
+  }
+  .screen[data-screen="birthday"] .nanha-cake {
+    --cake-w: clamp(110px, 14vh, 150px);
+    min-width: 100px;
+  }
+  .screen[data-screen="birthday"] .cake-scene {
+    height: clamp(96px, 14vh, 132px);
+  }
+  .screen[data-screen="birthday"] .realistic-cake-svg {
+    max-height: clamp(96px, 14vh, 132px);
+  }
+  .screen[data-screen="birthday"] .cake-char-avatar {
+    width: clamp(4.5rem, 11vh, 7rem) !important;
+    height: clamp(5.5rem, 13.5vh, 8.5rem) !important;
+  }
+  .screen[data-screen="year"] .w-16 {
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+  }
+  .screen[data-screen="year"] .year-card-flight #flight-svg,
+  .screen[data-screen="year"] .year-card-flight svg {
+    max-height: clamp(7.5rem, 20vh, 10.5rem) !important;
+  }
+  .screen[data-screen="year"] .screen-inner.insp-inner > .year-card.w-full,
+  .screen[data-screen="year"] .screen-inner.insp-inner > .year-card.glass-card {
+    padding: clamp(1rem, 2.2vh, 1.55rem) clamp(1.1rem, 2.4vw, 1.85rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-title,
+  .screen[data-screen="year"] .screen-inner.insp-inner > .year-card h2 {
+    font-size: clamp(1.4rem, 3.4vh, 2.15rem) !important;
+    margin-bottom: 0.45rem !important;
+  }
+  .screen[data-screen="year"] .year-card-flight {
+    margin-top: 0.4rem !important;
+    margin-bottom: 0.4rem !important;
+    padding-block: 0.25rem !important;
+  }
+  .screen[data-screen="year"] #year-quote,
+  .screen[data-screen="year"] .year-card-quote {
+    font-size: clamp(1rem, 2.3vh, 1.35rem) !important;
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+  .screen[data-screen="year"] .year-card-body {
+    margin-bottom: 0.75rem !important;
+    font-size: clamp(0.88rem, 1.9vh, 1rem) !important;
+  }
+  .screen[data-screen="admire"] .flower {
+    width: min(24vh, 190px) !important;
+  }
+  .screen[data-screen="admire"] .reason {
+    max-height: min(28vh, 200px) !important;
+  }
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) .flower {
+    width: min(18vh, 150px) !important;
+  }
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) .reason {
+    max-height: min(22vh, 170px) !important;
+  }
+  .screen[data-screen="gift"] .gift-polaroid {
+    width: min(36vw, 240px) !important;
+  }
+  .screen[data-screen="gift"] .bigbox {
+    width: min(28vw, 150px) !important;
+  }
+  .screen[data-screen="gift"] .gift-text {
+    font-size: clamp(1.05rem, 2.6vh, 1.35rem) !important;
+  }
+  .screen[data-screen="gate"] .gate-card {
+    padding: 22px 28px !important;
+    gap: 8px !important;
+  }
+  .screen[data-screen="gate"] .gate-q {
+    font-size: clamp(1.55rem, 3.6vh, 2.4rem) !important;
+  }
+}
+
+/* Common laptop height band (~1366×768) */
+@media (min-width: 768px) and (max-height: 768px) {
+  :root {
+    --desk-chrome-top: 4.35rem;
+    --desk-chrome-bot: 1.85rem;
+    --desk-card-pad-y: 0.55rem;
+    --desk-gap: 0.3rem;
+  }
+  .screen[data-screen="birthday"] #bday-title {
+    font-size: clamp(1.45rem, 3.8vh, 2.25rem) !important;
+  }
+  .screen[data-screen="birthday"] #bday-quote {
+    -webkit-line-clamp: 3;
+    font-size: clamp(0.95rem, 2.2vh, 1.25rem) !important;
+  }
+  .screen[data-screen="birthday"] .nanha-cake {
+    --cake-w: clamp(100px, 12.5vh, 138px);
+  }
+  .screen[data-screen="birthday"] .cake-scene,
+  .screen[data-screen="birthday"] .realistic-cake-svg {
+    height: clamp(88px, 12.5vh, 118px);
+    max-height: clamp(88px, 12.5vh, 118px);
+  }
+  .screen[data-screen="birthday"] .cake-char-avatar {
+    width: clamp(4rem, 10vh, 6.25rem) !important;
+    height: clamp(5rem, 12vh, 7.5rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-flight #flight-svg,
+  .screen[data-screen="year"] .year-card-flight svg {
+    max-height: min(18vh, 8.5rem) !important;
+  }
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) .flower {
+    width: min(16vh, 135px) !important;
+  }
+  .screen[data-screen="admire"] .admire-inner:has(#admire-next:not([hidden])) .reason {
+    max-height: min(20vh, 155px) !important;
+  }
+}
+
+/* Kill Tailwind width-only size jumps when height is short */
+@media (min-width: 640px) and (max-height: 800px) {
+  .screen[data-screen="birthday"] .bday-card-wrap > .glass-card.p-6,
+  .screen[data-screen="birthday"] .bday-card-wrap > .glass-card.sm\:p-10,
+  .screen[data-screen="birthday"] .glass-card.p-6.sm\:p-10 {
+    padding: clamp(0.55rem, 1.5vh, 1.1rem) clamp(0.85rem, 2vw, 1.5rem) !important;
+  }
+  .screen[data-screen="birthday"] #bday-title.text-4xl,
+  .screen[data-screen="birthday"] #bday-title.sm\:text-6xl {
+    font-size: clamp(1.5rem, 4vh, 2.4rem) !important;
+  }
+  .screen[data-screen="birthday"] #bday-quote.text-2xl,
+  .screen[data-screen="birthday"] #bday-quote.sm\:text-3xl {
+    font-size: clamp(1rem, 2.4vh, 1.4rem) !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .screen[data-screen="birthday"] #cake-card.p-5,
+  .screen[data-screen="birthday"] #cake-card.sm\:p-7 {
+    padding: clamp(0.4rem, 1.2vh, 0.9rem) clamp(0.55rem, 1.6vw, 1.1rem) !important;
+    margin-bottom: 0.55rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 720px) {
+  /* Hide only the empty finale placeholder; .show keeps it visible after the cut */
+  .screen[data-screen="birthday"] #cake-finale:not(.show) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+  }
+  .screen[data-screen="gift"] #funny-sad-status {
+    min-height: 0.75rem !important;
+  }
+  .screen[data-screen="birthday"] .cake-char-avatar {
+    width: clamp(3.6rem, 9vh, 5.5rem) !important;
+    height: clamp(4.4rem, 11vh, 6.75rem) !important;
+  }
+  .screen[data-screen="birthday"] .cake-scene,
+  .screen[data-screen="birthday"] .realistic-cake-svg {
+    height: clamp(80px, 11vh, 108px);
+    max-height: clamp(80px, 11vh, 108px);
+  }
+  .screen[data-screen="year"] .year-card-flight #flight-svg,
+  .screen[data-screen="year"] .year-card-flight svg {
+    max-height: min(15vh, 7.25rem) !important;
+  }
+  .screen[data-screen="year"] .year-card-badge {
+    margin-bottom: 0.35rem !important;
+  }
+  .screen[data-screen="gift"] .gift-polaroid {
+    width: min(32vw, 200px) !important;
+  }
+}

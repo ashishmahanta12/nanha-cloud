@@ -1,0 +1,250 @@
+/* ============================================================
+   Inspiration.html opening → gate (near pixel-faithful port)
+   Scoped recreation of ambient, chrome, gate card, pills, sparkles.
+   Does not replace story/cloud styles elsewhere.
+   ============================================================ */
+
+:root {
+  --insp-bg: #FCFBF9;
+  --insp-text: #4A3528;
+  --insp-muted: #8C7565;
+  --insp-brown: #66462C;
+  --insp-blush: #FFD6DE;
+  --insp-lavender: #EADCF9;
+  --insp-mint: #DAF5EB;
+  --insp-baby: #DBEAFE;
+  --insp-peach: #FFE5D9;
+  --insp-butter: #FFF2C6;
+  --insp-shadow-glass: 0 12px 40px rgba(102, 70, 44, 0.08), 0 2px 8px rgba(102, 70, 44, 0.04);
+  --insp-shadow-soft: 0 8px 24px rgba(102, 70, 44, 0.06);
+  --insp-radius: 28px;
+}
+
+body {
+  background-color: var(--insp-bg);
+  color: var(--insp-text);
+}
+
+::selection {
+  background: var(--insp-blush);
+  color: var(--insp-brown);
+}
+
+/* ---- Ambient: Inspiration fixed layer ---- */
+.ambient.insp-ambient {
+  opacity: 0.4;
+  background: var(--insp-bg);
+}
+
+.ambient.insp-ambient .mandala-svg-a {
+  top: -8rem;
+  right: -8rem;
+  width: min(92vw, 520px);
+  color: #E0CEBE;
+  opacity: 1;
+  animation: insp-spin-slow 90s linear infinite;
+}
+
+.ambient.insp-ambient .mandala-svg-b {
+  bottom: -10rem;
+  left: -10rem;
+  width: min(88vw, 500px);
+  color: #EADCF9;
+  opacity: 1;
+  animation: insp-spin-reverse 110s linear infinite;
+}
+
+@keyframes insp-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes insp-spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.insp-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(28px);
+}
+.insp-orb-a {
+  top: 20%;
+  left: 10%;
+  width: 6rem;
+  height: 6rem;
+  background: linear-gradient(to top right, rgba(255, 214, 222, 0.3), rgba(255, 229, 217, 0.2));
+  animation: insp-float 5s ease-in-out infinite;
+}
+.insp-orb-b {
+  top: 65%;
+  right: 12%;
+  width: 8rem;
+  height: 8rem;
+  background: linear-gradient(to top right, rgba(218, 245, 235, 0.3), rgba(219, 234, 254, 0.2));
+  animation: insp-float 6s ease-in-out infinite 2s;
+}
+.insp-orb-c {
+  bottom: 15%;
+  left: 25%;
+  width: 5rem;
+  height: 5rem;
+  filter: blur(20px);
+  background: linear-gradient(to top right, rgba(255, 242, 198, 0.3), rgba(255, 214, 222, 0.2));
+  animation: insp-float 5s ease-in-out infinite;
+}
+@keyframes insp-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(3deg); }
+}
+
+/* Hide particle generators during Inspiration opening feel */
+.ambient.insp-ambient #bubbles,
+.ambient.insp-ambient #sparkles,
+.ambient.insp-ambient #petals {
+  display: none;
+}
+
+/* ---- Chrome: Inspiration floating top bar ---- */
+.chrome.insp-chrome {
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  pointer-events: none;
+  background: transparent;
+}
+@media (min-width: 640px) {
+  .chrome.insp-chrome { padding: 1rem; }
+}
+.chrome.insp-chrome > * { pointer-events: auto; }
+
+.chrome.insp-chrome .chrome-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.375rem 0.875rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 2px rgba(102, 70, 44, 0.06);
+  transition: transform 0.2s ease;
+  color: var(--insp-brown);
+}
+.chrome.insp-chrome .chrome-brand:hover { transform: scale(1.05); }
+.chrome.insp-chrome .chrome-brand-emoji { font-size: 1.25rem; line-height: 1; }
+.chrome.insp-chrome .chrome-brand-text {
+  display: inline;
+  font-family: "Caveat", "Dancing Script", cursive;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--insp-brown);
+  white-space: nowrap;
+}
+@media (min-width: 640px) {
+  .chrome.insp-chrome .chrome-brand-text { font-size: 1.25rem; }
+}
+
+/* Music button uses nanha-gift circular icon-btn styles from style.css */
+.chrome.insp-chrome #btn-music.music-toggle,
+.chrome.insp-chrome .icon-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.35rem;
+}
+.chrome.insp-chrome #btn-music.music-toggle .music-disc {
+  width: 28px;
+  height: 28px;
+}
+.chrome.insp-chrome #btn-music.music-toggle .music-disc-label {
+  width: 13px;
+  height: 13px;
+}
+.chrome.insp-chrome #btn-music.music-toggle .music-note-svg {
+  width: 14px;
+  height: 14px;
+}
+.chrome.insp-chrome #btn-music.music-toggle .music-eq {
+  right: -3px;
+  bottom: -2px;
+  height: 11px;
+  padding: 1px 3px;
+}
+
+/* ---- Gate: glass card only — lock / pills / writing live in style.css (from nanha-gift) ---- */
+.screen[data-screen="gate"] {
+  padding-top: calc(var(--safe-t) + 1.25rem);
+  padding-left: max(1rem, var(--safe-l));
+  padding-right: max(1rem, var(--safe-r));
+}
+.screen[data-screen="gate"] .gate-card.glass-card,
+.screen[data-screen="gate"] .gate-card {
+  /* Opaque frost — backdrop-filter over spinning mandalas caused cursor jank */
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 12px 30px -10px rgba(122, 84, 64, .22),
+    0 2px 8px rgba(122, 84, 64, .07),
+    0 0 0 1px rgba(255, 255, 255, .5) inset,
+    0 0 40px rgba(255, 255, 255, .5) inset;
+}
+.screen[data-screen="gate"] .shake-card {
+  animation: insp-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes insp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px) rotate(-1deg); }
+  40%, 80% { transform: translateX(8px) rotate(1deg); }
+}
+
+/* ---- Loader styled like Inspiration glass ---- */
+.loader {
+  background: var(--insp-bg);
+}
+.loader-inner.glass {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: var(--insp-shadow-glass);
+  border-radius: var(--insp-radius);
+}
+
+/* ---- Inspiration sparkle trail — WAAPI in initCursor owns fade/move ---- */
+.nanha-sparkle-trail {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 14px;
+  z-index: 9999;
+  margin: 0;
+  line-height: 1;
+  opacity: 0.9;
+  transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+  animation: none !important;
+  text-shadow: 0 1px 4px rgba(102, 70, 44, 0.1);
+  contain: layout style;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient.insp-ambient .mandala-svg-a,
+  .ambient.insp-ambient .mandala-svg-b,
+  .insp-orb,
+  .nanha-sparkle-trail {
+    animation: none !important;
+  }
+}

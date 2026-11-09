@@ -3,6 +3,7 @@ server/node_modules/
 server/.env
 server/uploads/tmp/*
 !server/uploads/tmp/.gitkeep
+server/data/
 .DS_Store
 *.log
 .vitest/
@@ -10,3 +11,20 @@ coverage/
 .env
 .env.*
 !.env.example
+
+# Local / private artifacts — never ship
+.cursor/
+*.mp4
+upload/
+new_upload/
+nanha-gift/
+Inspiration.html
+design.txt
+prompt.txt
+SETUP-CREDENTIALS.md
+WhatsApp Chat with *.txt
+"WhatsApp Chat with "*.txt
+
+# Cloudflare local
+.wrangler/
+.dev.vars

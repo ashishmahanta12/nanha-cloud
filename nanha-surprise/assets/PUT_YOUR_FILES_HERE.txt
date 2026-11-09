@@ -1,11 +1,12 @@
 ﻿Drop these files into this folder (same names):
 
-  music.mp3
   baby.jpg
-  hand-gift.jpg
+  gallery/gift.webp
   char1.png, char2.png, char3.png
-  memories/m1.jpg … m10.jpg
+  memories/m1.jpg … m14.jpg
   gallery/g1.jpg … g8.jpg (or more — update CONFIG.gallery)
   cats/cat1.gif … cat5.gif
 
-Until you add them, the site shows cute illustrated placeholders.
+Music comes from the Nanha playlist (server .env) — no music.mp3 needed.
+
+Until you add images, the site shows cute illustrated placeholders.

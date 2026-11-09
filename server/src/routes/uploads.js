@@ -33,12 +33,19 @@ router.post(
       await ensureGalleryFolders(galleryId);
     }
 
+    let capturedAt = null;
+    if (req.body?.capturedAt) {
+      const d = new Date(req.body.capturedAt);
+      if (!Number.isNaN(d.getTime())) capturedAt = d;
+    }
+
     const { uploadId, totalBytes } = await initUpload({
       galleryId,
       name: meta.name,
       size: meta.size,
       mimeType: meta.mimeType,
       category: meta.category,
+      capturedAt,
     });
 
     res.status(201).json({ uploadId, totalBytes, mimeType: meta.mimeType, category: meta.category });

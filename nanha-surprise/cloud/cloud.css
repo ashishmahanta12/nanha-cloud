@@ -48,12 +48,76 @@
   margin-bottom: 0.75rem;
   box-shadow: var(--shadow);
 }
+.cloud-storage.is-infinite {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  overflow: hidden;
+  isolation: isolate;
+  /* Solid readable base + soft animated border wash */
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid transparent;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.96), rgba(255, 252, 248, 0.96)),
+    linear-gradient(
+      120deg,
+      #FFD6DE,
+      #FFE5D9,
+      #EADCF9,
+      #DAF5EB,
+      #FFD6DE
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 100% 100%, 300% 300%;
+  animation: cloud-storage-wash 7s ease-in-out infinite;
+  box-shadow:
+    0 4px 16px rgba(92, 64, 51, 0.08),
+    0 0 20px rgba(248, 200, 220, 0.35);
+}
+.cloud-storage.is-infinite::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    115deg,
+    rgba(248, 200, 220, 0.22) 0%,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(232, 213, 242, 0.2) 62%,
+    rgba(200, 232, 220, 0.16) 100%
+  );
+  background-size: 220% 220%;
+  animation: cloud-storage-wash 8s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+.cloud-storage.is-infinite::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 40%;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  animation: cloud-storage-sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
 .cloud-storage-bar {
   height: 8px;
   border-radius: 999px;
   background: rgba(92, 64, 51, 0.1);
   overflow: hidden;
   margin: 0.45rem 0;
+}
+.cloud-storage.is-infinite .cloud-storage-bar {
+  display: none;
 }
 .cloud-storage-fill {
   height: 100%;
@@ -62,12 +126,243 @@
   border-radius: inherit;
   transition: width 0.4s var(--ease-soft);
 }
+.cloud-storage-infinite {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fff7fb, #f3e9ff);
+  box-shadow:
+    inset 0 0 0 1px rgba(248, 200, 220, 0.55),
+    0 0 12px rgba(248, 200, 220, 0.55);
+}
+.cloud-storage-glow {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(248, 200, 220, 0.75) 0%,
+    rgba(232, 213, 242, 0.35) 48%,
+    transparent 70%
+  );
+  animation: cloud-storage-breathe 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.cloud-storage-infinity {
+  position: relative;
+  z-index: 1;
+  font-size: 1.45rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(92, 64, 51, 0.18));
+  animation: cloud-storage-float 2.8s ease-in-out infinite;
+}
 .cloud-storage-meta {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
   font-size: 0.8rem;
   opacity: 0.85;
+  min-width: 0;
+}
+.cloud-storage.is-infinite .cloud-storage-meta {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  opacity: 1;
+}
+.cloud-storage-label {
+  font-family: var(--font-script, "Caveat", cursive);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: #4a3228;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.cloud-storage-cap {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #4a3228;
+  background: linear-gradient(
+    90deg,
+    #f8c8dc,
+    #ffdcc8,
+    #e8d5f2,
+    #c8e8dc,
+    #f8c8dc
+  );
+  background-size: 240% 100%;
+  animation: cloud-storage-badge 5s ease-in-out infinite;
+  box-shadow: inset 0 0 0 1px rgba(92, 64, 51, 0.08);
+}
+.cloud-storage-files {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.72;
+  color: #5c4033;
+}
+@keyframes cloud-storage-wash {
+  0%,
+  100% {
+    background-position: 0% 50%, 0% 50%;
+  }
+  50% {
+    background-position: 0% 50%, 100% 50%;
+  }
+}
+@keyframes cloud-storage-badge {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes cloud-storage-sheen {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  55% {
+    transform: translateX(320%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(320%);
+    opacity: 0;
+  }
+}
+@keyframes cloud-storage-breathe {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+@keyframes cloud-storage-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.08) rotate(3deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cloud-storage.is-infinite,
+  .cloud-storage.is-infinite::before,
+  .cloud-storage.is-infinite::after,
+  .cloud-storage-glow,
+  .cloud-storage-infinity,
+  .cloud-storage-cap {
+    animation: none;
+  }
+}
+
+/* Gallery vault: storage is a quiet status line under tools */
+.cloud-storage.photos-storage {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+  border-radius: 0;
+  padding: 0.15rem 0 0;
+  gap: 0.4rem;
+  justify-content: flex-start;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+.photos-controls .cloud-storage.photos-storage {
+  justify-self: start;
+}
+.cloud-storage.photos-storage.is-infinite {
+  background: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  animation: none;
+}
+.cloud-storage.photos-storage.is-infinite::before,
+.cloud-storage.photos-storage.is-infinite::after {
+  display: none;
+}
+.cloud-storage.photos-storage .cloud-storage-infinite {
+  width: 1.35rem;
+  height: 1.35rem;
+  background: rgba(255, 247, 251, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(196, 139, 160, 0.22);
+}
+.cloud-storage.photos-storage .cloud-storage-glow {
+  animation: none;
+  opacity: 0.35;
+}
+.cloud-storage.photos-storage .cloud-storage-infinity {
+  font-size: 0.8rem;
+  animation: none;
+  filter: none;
+}
+.cloud-storage.photos-storage.is-infinite .cloud-storage-meta {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  opacity: 0.88;
+}
+.cloud-storage.photos-storage .cloud-storage-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--choc);
+  opacity: 0.78;
+  text-shadow: none;
+}
+.cloud-storage.photos-storage .cloud-storage-cap {
+  font-size: 0.58rem;
+  padding: 0.05rem 0.4rem;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: var(--choc-mid, #66462C);
+  background: rgba(248, 200, 220, 0.28);
+  animation: none;
+  box-shadow: none;
+}
+.cloud-storage.photos-storage .cloud-storage-files {
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: 0.68;
+  color: var(--choc);
+  flex-basis: auto;
+  width: auto;
+}
+@media (max-width: 520px) {
+  .photos-controls .cloud-storage.photos-storage .cloud-storage-label {
+    font-size: 0.88rem;
+  }
+  .photos-controls .cloud-storage.photos-storage .cloud-storage-cap {
+    display: none;
+  }
 }
 
 .cloud-toolbar {
@@ -84,26 +379,35 @@
   flex: 1;
 }
 .cloud-chip {
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid var(--glass-border);
+  background: linear-gradient(135deg, #FFF0F4 0%, #F5E6FF 55%, #FFEFE6 100%);
+  border: 1.5px solid rgba(102, 70, 44, 0.12);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--choc-mid, #66462C);
+  transition: transform 0.2s var(--ease, cubic-bezier(0.34, 1.56, 0.64, 1)), box-shadow 0.2s;
+}
+.cloud-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft, 0 8px 24px rgba(102, 70, 44, 0.06));
 }
 .cloud-chip.is-active {
-  background: var(--white);
-  box-shadow: var(--shadow);
+  background: linear-gradient(135deg, #66462C 0%, #8A5D3B 100%);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(102, 70, 44, 0.22);
 }
 .cloud-search {
   flex: 1 1 140px;
   min-width: 120px;
   padding: 0.45rem 0.75rem;
   border-radius: 999px;
-  border: 1px solid var(--glass-border);
-  background: var(--white);
+  border: 1px solid var(--glass-border-warm, rgba(230, 218, 206, 0.6));
+  background: rgba(255, 252, 248, 0.95);
   font: inherit;
-  color: var(--choc);
+  color: var(--choc, #4A3528);
+  box-shadow: var(--shadow-soft, 0 4px 12px rgba(102, 70, 44, 0.05));
 }
 .cloud-view-toggle,
 .cloud-sort {
@@ -131,6 +435,58 @@
 .cloud-dropzone p {
   font-size: 0.9rem;
   opacity: 0.85;
+}
+
+/* Gallery vault drop strip — calm idle, clear drag/focus */
+.cloud-dropzone.photos-dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0;
+  margin-bottom: 0;
+  padding: 0.42rem 0.95rem;
+  border-radius: 16px;
+  border: 1px dashed rgba(196, 139, 160, 0.32);
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition:
+    border-color 0.22s,
+    background 0.22s,
+    box-shadow 0.22s,
+    transform 0.22s var(--ease, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.cloud-dropzone.photos-dropzone:hover {
+  border-color: rgba(196, 139, 160, 0.55);
+  background: rgba(255, 252, 250, 0.55);
+}
+.cloud-dropzone.photos-dropzone:focus-visible {
+  outline: 2px solid var(--choc-soft, #8A5D3B);
+  outline-offset: 2px;
+}
+.cloud-dropzone.photos-dropzone.is-dragover {
+  border-color: var(--blush, #f8c8dc);
+  border-style: solid;
+  border-width: 1.5px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 0 0 3px rgba(248, 200, 220, 0.4);
+  transform: scale(1.01);
+}
+.cloud-dropzone.photos-dropzone p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--choc);
+  opacity: 0.62;
+}
+.cloud-dropzone.photos-dropzone:hover p,
+.cloud-dropzone.photos-dropzone.is-dragover p {
+  opacity: 0.88;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cloud-dropzone.photos-dropzone.is-dragover {
+    transform: none;
+  }
 }
 .cloud-drop-btn {
   margin-top: 0.5rem;
@@ -288,9 +644,134 @@
   width: 100%;
   gap: 0.5rem;
   flex-wrap: wrap;
+  align-items: center;
+  position: sticky;
+  bottom: calc(0.5rem + var(--safe-b, 0px));
+  z-index: 45;
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.95rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-sm, 22px);
+  box-shadow: var(--shadow, 0 12px 40px rgba(102, 70, 44, 0.08));
 }
 .cloud-bulk-bar.is-visible {
   display: flex;
+}
+
+/* Cute busy overlay while cloud work finishes */
+.cloud-busy {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(252, 251, 249, 0.92);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.cloud-busy[hidden] {
+  display: none !important;
+}
+.cloud-busy-card {
+  text-align: center;
+  padding: 1.45rem 1.7rem 1.25rem;
+  min-width: min(240px, 86vw);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+  box-shadow: var(--shadow, 0 12px 40px rgba(102, 70, 44, 0.08));
+  animation: cloud-busy-in 0.35s var(--ease, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+@keyframes cloud-busy-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+.cloud-busy-stage {
+  position: relative;
+  height: 5rem;
+  margin-bottom: 0.25rem;
+}
+.cloud-busy-cloud-main {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 6px 10px rgba(92, 64, 51, 0.22));
+  animation: cloud-busy-float-main 2s ease-in-out infinite;
+  z-index: 2;
+}
+.cloud-busy-cloud-main svg {
+  width: 92px;
+  height: 64px;
+}
+.cloud-busy-octopus {
+  position: absolute;
+  left: 58%;
+  top: 68%;
+  font-size: 1.35rem;
+  transform: translate(-50%, -50%);
+  animation: cloud-busy-peek 1.6s ease-in-out infinite;
+  z-index: 3;
+  filter: drop-shadow(0 2px 4px rgba(248, 200, 220, 0.45));
+}
+.cloud-busy-spark {
+  position: absolute;
+  font-size: 0.95rem;
+  opacity: 0.85;
+  animation: cloud-busy-float 2s ease-in-out infinite;
+  z-index: 1;
+}
+.cloud-busy-spark.s1 { left: 14%; top: 18%; animation-delay: 0s; }
+.cloud-busy-spark.s2 { right: 12%; top: 28%; animation-delay: 0.45s; }
+.cloud-busy-spark.s3 { left: 22%; bottom: 6%; animation-delay: 0.9s; font-size: 0.85rem; }
+@keyframes cloud-busy-float-main {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+  50% { transform: translate(-50%, -62%) scale(1.08) rotate(2deg); }
+}
+@keyframes cloud-busy-peek {
+  0%, 100% { transform: translate(-40%, -50%) rotate(-8deg); }
+  50% { transform: translate(-60%, -62%) rotate(8deg); }
+}
+@keyframes cloud-busy-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.55; }
+  50% { transform: translateY(-8px) scale(1.12); opacity: 1; }
+}
+.cloud-busy-msg {
+  margin: 0.15rem 0 0.55rem;
+  font-size: 1.35rem;
+  color: var(--choc-mid, #66462C);
+}
+.cloud-busy-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+}
+.cloud-busy-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blush, #f8c8dc);
+  animation: cloud-busy-dot 1.1s ease-in-out infinite;
+}
+.cloud-busy-dots span:nth-child(2) { animation-delay: 0.15s; background: var(--peach, #ffdcc8); }
+.cloud-busy-dots span:nth-child(3) { animation-delay: 0.3s; background: var(--lavender, #d8c7f0); }
+@keyframes cloud-busy-dot {
+  0%, 80%, 100% { transform: translateY(0) scale(0.85); opacity: 0.45; }
+  40% { transform: translateY(-5px) scale(1.15); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud-busy-octopus,
+  .cloud-busy-cloud-main,
+  .cloud-busy-spark,
+  .cloud-busy-dots span,
+  .cloud-busy-card {
+    animation: none;
+  }
 }
 
 .cloud-ctx {
@@ -320,7 +801,9 @@
   position: fixed;
   inset: 0;
   z-index: 9700;
-  background: rgba(40, 30, 25, 0.9);
+  background: rgba(48, 34, 28, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -333,35 +816,45 @@
 .cloud-preview-media {
   max-width: min(96vw, 900px);
   max-height: 70vh;
-  border-radius: 12px;
-  background: #1a1210;
+  border-radius: 18px;
+  background: #2A1F18;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 .cloud-preview-media img,
 .cloud-preview-media video {
   max-width: 100%;
   max-height: 70vh;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 18px;
 }
 .cloud-preview-info {
-  color: #fff;
-  margin-top: 0.75rem;
+  color: rgba(255, 251, 248, 0.92);
+  margin-top: 0.85rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-family: var(--font-romantic, "Dancing Script", cursive);
   max-width: 90vw;
 }
 .cloud-preview-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
   flex-wrap: wrap;
   justify-content: center;
 }
 .cloud-preview-actions button {
-  padding: 0.45rem 0.9rem;
+  padding: 0.55rem 1.05rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  font-weight: 600;
+  background: linear-gradient(135deg, #FFF0F4 0%, #F5E6FF 50%, #FFEFE6 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  color: var(--choc-mid, #66462C);
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s var(--ease, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.cloud-preview-actions button:hover {
+  transform: translateY(-2px) scale(1.02);
 }
 
 @media (min-width: 720px) {

@@ -51,6 +51,8 @@ See [`.env.example`](.env.example). Important:
 | `GALLERY_ACCESS_CODE` | Shared invite / `?invite=` value |
 | `GOOGLE_*` | OAuth client + offline refresh token |
 | `MAX_UPLOAD_BYTES` | Upload size cap |
+| `YOUTUBE_API_KEY` | Data API key for Nanha Music playlist proxy (keep server-side) |
+| `YOUTUBE_PLAYLIST_ID` | Public/Unlisted playlist id (`list=` from URL) |
 
 ## API (session cookie required for `/api/cloud/*`)
 
@@ -61,9 +63,11 @@ See [`.env.example`](.env.example). Important:
 - `GET /api/cloud/assets/:id/content` — original (GIFs stay animated)
 - `GET /api/cloud/assets/:id/thumbnail` — static thumb
 - `POST /api/cloud/uploads` → `PUT …/:id` chunks → `POST …/:id/complete`
-- `POST /api/cloud/assets/:id/trash` · `restore` · `DELETE` permanent
+- `POST /api/cloud/assets/:id/trash` — move into Drive folder `Trash` (never Google system trash; never permanent delete)
+- `POST /api/cloud/assets/:id/restore` — move back to original Nanha Cloud category folder
 - `GET /api/cloud/trash`
 - `GET /api/cloud/storage` — real Drive `storageQuota`
+- `GET /api/youtube/playlist` — public Nanha Music tracks proxy (no session; returns `{ tracks }` or 503 if unset)
 
 Socket.IO namespace: `/cloud` (auth via `auth.galleryId` after redeem).
 

@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: nanha-cloud
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: MONGODB_URI
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: GALLERY_ID
+        sync: false
+      - key: GALLERY_ACCESS_CODE
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: GOOGLE_REFRESH_TOKEN
+        sync: false
+      - key: MAX_UPLOAD_BYTES
+        value: "524288000"
+      - key: COOKIE_NAME
+        value: nanha_session
+      - key: COOKIE_MAX_AGE_DAYS
+        value: "30"
+      - key: TRASH_RETENTION_DAYS
+        value: "30"
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: YOUTUBE_PLAYLIST_ID
+        sync: false
