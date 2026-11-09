@@ -847,9 +847,19 @@ function setTimelineFill(fill, px, maxPx) {
   if (!fill) return;
   const max = Math.max(1, Number(maxPx) || 1);
   const ratio = Math.max(0, Math.min(1, (Number(px) || 0) / max));
-  fill.style.transform = `scaleY(${ratio})`;
+  const line = fill.parentElement;
+  // One shared progress var — fill scale + tip top stay locked together
+  if (line) line.style.setProperty("--tl-fill", String(ratio));
+  fill.style.transform = "";
   fill.dataset.fillPx = String(px);
   fill.dataset.fillMax = String(max);
+  const tip = line?.querySelector(".tl-fill-tip") || $("#tl-fill-tip");
+  if (!tip) return;
+  tip.style.top = "";
+  if (!tip.closest(".timeline.is-forever-lit, .timeline.is-forever-connecting")) {
+    tip.style.opacity = ratio <= 0.002 ? "0" : "1";
+    tip.style.transform = "";
+  }
 }
 
 function screenIndex(id) {
@@ -3677,27 +3687,51 @@ async function drainToMemories() {
       Sound.play("sparkle");
     }, dur * 0.32);
 
-    // Timeline fill eases smoothly via scaleY (GPU) — no height layout thrash
+    // Timeline fill + tip share --tl-fill; emerge animates both in lockstep then commits
     let fillRise = Promise.resolve();
     if (fill) {
+      const lineEl = fill.parentElement;
+      const tip = lineEl?.querySelector(".tl-fill-tip") || $("#tl-fill-tip");
       fill.style.transition = "none";
+      if (tip) tip.style.transition = "none";
       setTimelineFill(fill, 0, lineH);
-      fillRise = anim(
-        fill,
-        [
-          { transform: "scaleY(0)", offset: 0 },
-          { transform: `scaleY(${restRatio * 0.45})`, offset: 0.45 },
-          { transform: `scaleY(${restRatio})`, offset: 1 },
-        ],
-        {
-          duration: dur * 0.72,
-          delay: dur * 0.26,
-          easing: "cubic-bezier(0.33, 0.12, 0.18, 1)",
-          fill: "forwards",
-        }
-      ).then(() => {
+      const riseOpts = {
+        duration: dur * 0.72,
+        delay: dur * 0.26,
+        easing: "cubic-bezier(0.33, 0.12, 0.18, 1)",
+        fill: "forwards",
+      };
+      const mid = restRatio * 0.45;
+      const fillA = fill.animate
+        ? fill.animate(
+            [
+              { transform: "scaleY(0)", offset: 0 },
+              { transform: `scaleY(${mid})`, offset: 0.45 },
+              { transform: `scaleY(${restRatio})`, offset: 1 },
+            ],
+            riseOpts
+          )
+        : null;
+      const tipA =
+        tip?.animate
+          ? tip.animate(
+              [
+                { top: "0%", opacity: 0, offset: 0 },
+                { top: `${mid * 100}%`, opacity: 1, offset: 0.45 },
+                { top: `${restRatio * 100}%`, opacity: 1, offset: 1 },
+              ],
+              riseOpts
+            )
+          : null;
+      fillRise = Promise.all([
+        fillA?.finished.catch(() => {}) || Promise.resolve(),
+        tipA?.finished.catch(() => {}) || Promise.resolve(),
+      ]).then(() => {
+        fillA?.cancel();
+        tipA?.cancel();
         setTimelineFill(fill, restFillPx, lineH);
         fill.style.transition = "";
+        if (tip) tip.style.transition = "";
       });
     }
 
