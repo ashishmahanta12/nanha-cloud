@@ -113,27 +113,29 @@ export function createApp(envOverrides = {}) {
   return app;
 }
 
+async function bootstrapDrive(env) {
+  if (!(env.GOOGLE_REFRESH_TOKEN && env.GOOGLE_CLIENT_ID)) {
+    console.warn("[nanha-cloud] Google Drive not configured — cloud uploads will fail until tokens are set");
+    return;
+  }
+  try {
+    await ensureGalleryFolders(env.GALLERY_ID);
+    console.log("[nanha-cloud] Drive folder taxonomy ready");
+    const sync = await resyncGalleryFromDrive(env.GALLERY_ID);
+    console.log(
+      `[nanha-cloud] Drive resync: ${sync.created} restored, ${sync.updated} updated, ${sync.skipped} skipped`
+    );
+  } catch (err) {
+    console.warn("[nanha-cloud] Drive bootstrap deferred:", err.message);
+  }
+}
+
 export async function startServer() {
   const env = loadEnv({ strict: true });
   await connectMongo(env.MONGODB_URI);
 
   if (env.GALLERY_ACCESS_CODE) {
     await ensureSeedInvite(env.GALLERY_ACCESS_CODE, env.GALLERY_ID);
-  }
-
-  if (env.GOOGLE_REFRESH_TOKEN && env.GOOGLE_CLIENT_ID) {
-    try {
-      await ensureGalleryFolders(env.GALLERY_ID);
-      console.log("[nanha-cloud] Drive folder taxonomy ready");
-      const sync = await resyncGalleryFromDrive(env.GALLERY_ID);
-      console.log(
-        `[nanha-cloud] Drive resync: ${sync.created} restored, ${sync.updated} updated, ${sync.skipped} skipped`
-      );
-    } catch (err) {
-      console.warn("[nanha-cloud] Drive bootstrap deferred:", err.message);
-    }
-  } else {
-    console.warn("[nanha-cloud] Google Drive not configured — cloud uploads will fail until tokens are set");
   }
 
   const app = createApp(env);
@@ -149,9 +151,19 @@ export async function startServer() {
   });
   initCloudNamespace(io);
 
-  server.listen(env.PORT, () => {
-    console.log(`[nanha-cloud] listening on ${env.PUBLIC_BASE_URL || `http://localhost:${env.PORT}`}`);
+  // Bind 0.0.0.0 so Render health checks can reach the port.
+  // Run Drive resync after listen — a long sync must not block port open.
+  await new Promise((resolve, reject) => {
+    server.listen(env.PORT, "0.0.0.0", (err) => {
+      if (err) return reject(err);
+      console.log(
+        `[nanha-cloud] listening on 0.0.0.0:${env.PORT} (${env.PUBLIC_BASE_URL || "no PUBLIC_BASE_URL"})`
+      );
+      resolve();
+    });
   });
+
+  void bootstrapDrive(env);
 
   return { app, server, io };
 }
