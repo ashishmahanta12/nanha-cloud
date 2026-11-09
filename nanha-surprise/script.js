@@ -4969,12 +4969,65 @@ function initLetter() {
 let quizLocked = false;
 let quizDone = false;
 let quizSessionId = "";
+let quizShockedTimer = 0;
+const QUIZ_SHOCKED_SRC = "assets/cats/shocked.gif";
+/* One full loop of assets/cats/shocked.gif (56 frames × 10cs) */
+const QUIZ_SHOCKED_MS = 5600;
+/* Letter triggers for spicy picks; Q3 uses any incorrect logical answer */
+const QUIZ_SHOCKED_LETTERS = {
+  Q1: "D",
+  Q5: "B",
+  Q12: "A",
+  Q15: "C",
+  Q16: "B",
+};
 
 function newQuizSessionId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }
   return `quiz-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function shouldShowQuizShocked(Q, letter, actuallyCorrect) {
+  if (!Q) return false;
+  if (Q.id === "Q3") return actuallyCorrect === false;
+  return QUIZ_SHOCKED_LETTERS[Q.id] === letter;
+}
+
+function hideQuizShockedGifs() {
+  if (quizShockedTimer) {
+    clearTimeout(quizShockedTimer);
+    quizShockedTimer = 0;
+  }
+  const layer = $("#quiz-shocked-gifs");
+  if (!layer) return;
+  layer.classList.remove("is-on");
+  layer.setAttribute("aria-hidden", "true");
+}
+
+function showQuizShockedGifs(holdMs = QUIZ_SHOCKED_MS) {
+  const layer = $("#quiz-shocked-gifs");
+  if (!layer) return;
+  if (quizShockedTimer) {
+    clearTimeout(quizShockedTimer);
+    quizShockedTimer = 0;
+  }
+  /* Restart GIF from frame 0 each trigger so a full loop always plays */
+  const bust = `${QUIZ_SHOCKED_SRC}?t=${Date.now()}`;
+  $$("img.quiz-shocked", layer).forEach((img) => {
+    img.src = bust;
+  });
+  layer.setAttribute("aria-hidden", "false");
+  layer.classList.remove("is-on");
+  void layer.offsetWidth;
+  requestAnimationFrame(() => layer.classList.add("is-on"));
+  if (holdMs > 0) {
+    quizShockedTimer = setTimeout(() => {
+      quizShockedTimer = 0;
+      hideQuizShockedGifs();
+    }, holdMs);
+  }
 }
 
 function ensureQuizSession() {
@@ -5048,6 +5101,7 @@ function resetQuizUI() {
   quizLocked = false;
   quizDone = false;
   quizSessionId = newQuizSessionId();
+  hideQuizShockedGifs();
   const lb = $("#lockbox");
   lb?.classList.remove("unlocked", "happy");
   const card = $("#q-card");
@@ -5113,6 +5167,7 @@ async function pickQuizOption(btn, choice, optionIndex, Q) {
     ? null
     : choice === Q.answer || optionIndex === Q.correctIndex;
   const displayOk = isPersonality || actuallyCorrect === true;
+  const shock = shouldShowQuizShocked(Q, letter, actuallyCorrect);
 
   void persistQuizAnswer({
     sessionId: ensureQuizSession(),
@@ -5135,6 +5190,8 @@ async function pickQuizOption(btn, choice, optionIndex, Q) {
     haptic([15, 25, 15]);
     card?.classList.remove("q-card-wrong");
     card?.classList.add("q-card-correct");
+    if (shock) showQuizShockedGifs(QUIZ_SHOCKED_MS);
+    else hideQuizShockedGifs();
     if (fb) {
       fb.textContent = isPersonality
         ? "Correct! ✨"
@@ -5153,8 +5210,18 @@ async function pickQuizOption(btn, choice, optionIndex, Q) {
       lb.classList.add("happy");
     }
     quizGlow();
-    await sleep(reduceMotion ? 200 : 1200);
+    /* Wait for a full shocked loop before advancing on spicy picks */
+    await sleep(
+      shock
+        ? reduceMotion
+          ? Math.min(900, QUIZ_SHOCKED_MS)
+          : QUIZ_SHOCKED_MS
+        : reduceMotion
+          ? 200
+          : 1200
+    );
     card?.classList.remove("q-card-correct");
+    hideQuizShockedGifs();
     if (state.quizIndex >= (CONFIG.quiz || []).length) unlockQuiz();
     else showQuizQ();
   } else {
@@ -5168,6 +5235,8 @@ async function pickQuizOption(btn, choice, optionIndex, Q) {
     shake(card);
     Sound.play("wrong");
     haptic([30, 40, 30]);
+    if (shock) showQuizShockedGifs(QUIZ_SHOCKED_MS);
+    else hideQuizShockedGifs();
     if (fb) {
       fb.textContent = CONFIG.quizOops || "Incorrect — try again, Nanhi Bacchi 🥺";
       fb.className = "hint q-fb-oops";
@@ -5179,6 +5248,7 @@ function showQuizQ() {
   const raw = (CONFIG.quiz || [])[state.quizIndex];
   if (!raw) return;
   ensureQuizSession();
+  hideQuizShockedGifs();
   const Q = normalizeQuiz(raw, state.quizIndex);
   const n = (CONFIG.quiz || []).length;
   quizLocked = false;
@@ -5240,6 +5310,12 @@ function showQuizQ() {
 function initQuiz() {
   const screen = screenEl("quiz");
   hydrateGiftArt(screen || document);
+  /* Prefetch shocked reaction so spicy picks feel instant */
+  {
+    const im = new Image();
+    im.decoding = "async";
+    im.src = QUIZ_SHOCKED_SRC;
+  }
   const title = $("#quiz-title");
   if (title && CONFIG.quizTitle) title.textContent = CONFIG.quizTitle;
   reveal(
@@ -5483,8 +5559,10 @@ function resetGiftUI() {
     revealEl.hidden = true;
     revealEl.style.visibility = "";
   }
+  clearGiftRevealAnimFills();
   const giftInner = screenEl("gift")?.querySelector(".gift-inner");
   if (giftInner) giftInner.style.visibility = "";
+  restoreNoBtnHome();
   const no = $("#btn-no");
   if (no) {
     no.hidden = false;
@@ -5509,6 +5587,27 @@ function resetGiftUI() {
   if (cats) cats.innerHTML = "";
 }
 
+function restoreNoBtnHome() {
+  const b = $("#btn-no");
+  const yn = $("#yn");
+  if (b && yn && b.parentElement !== yn) yn.appendChild(b);
+}
+
+function clearGiftRevealAnimFills() {
+  /* reveal() uses fill:"both" and leaves translate3d/scale on #yn — that
+     traps position:fixed (Nhi flee) inside the small yn box so the button
+     jumps off-screen and gets clipped by the gift screen overflow. */
+  $$("#gift-reveal > *").forEach((el) => {
+    el.getAnimations?.().forEach((a) => {
+      try {
+        a.cancel();
+      } catch (_) {}
+    });
+    el.style.removeProperty("opacity");
+    el.style.removeProperty("transform");
+  });
+}
+
 function resetNoBtnChrome() {
   noLastTap = 0;
   noScale = 1;
@@ -5525,6 +5624,7 @@ function resetNoBtnChrome() {
     } catch (_) {}
     noLabelAnim = null;
   }
+  restoreNoBtnHome();
   const label = $("#btn-no-label");
   const first = giftCfg().noLabels[0] || "Nhi 😢";
   if (label) label.textContent = first;
@@ -5546,24 +5646,34 @@ function noRectsOverlap(a, b, pad = 14) {
 }
 
 function pickNoFleePoint(bw, bh) {
+  const screen = screenEl("gift");
+  const sr = screen?.getBoundingClientRect();
+  const left = sr ? sr.left : 0;
+  const top = sr ? sr.top : 0;
+  const width = sr ? sr.width : innerWidth;
+  const height = sr ? sr.height : innerHeight;
   const topPad = 76;
   const botPad = 58;
   const m = 12;
-  const maxX = Math.max(m, innerWidth - bw - m);
-  const maxY = Math.max(topPad, innerHeight - bh - botPad);
+  const maxX = Math.max(left + m, left + width - bw - m);
+  const maxY = Math.max(top + topPad, top + height - bh - botPad);
+  const minX = left + m;
+  const minY = top + topPad;
   const yes = $("#btn-yes");
   const yesR = yes?.getBoundingClientRect();
-  let x = rand(m, maxX);
-  let y = rand(topPad, maxY);
+  let x = rand(minX, maxX);
+  let y = rand(minY, maxY);
   if (yesR) {
     for (let i = 0; i < 14; i++) {
       const trial = { left: x, top: y, right: x + bw, bottom: y + bh };
       if (!noRectsOverlap(trial, yesR, 18)) break;
-      x = rand(m, maxX);
-      y = rand(topPad, maxY);
+      x = rand(minX, maxX);
+      y = rand(minY, maxY);
     }
   }
-  return { x, y };
+  /* Fixed containing block is the gift screen (it has a transform) —
+     convert viewport coords → screen-local left/top. */
+  return { x: x - left, y: y - top };
 }
 
 function setNoLabel(text) {
@@ -5595,18 +5705,26 @@ function setNoLabel(text) {
 function jumpNoBtn() {
   const b = $("#btn-no");
   if (!b) return;
+  const screen = screenEl("gift");
   const scale = noBtnScale();
   noScale = scale;
   b.style.setProperty("--ns", scale.toFixed(3));
+  /* In case Nhi is tapped before the post-reveal fill clear runs */
+  clearGiftRevealAnimFills();
 
-  /* Measure after label/scale CSS applied */
+  /* Measure in place, then reparent onto the gift screen so position:fixed
+     isn't trapped by a transformed ancestor (#yn keeps reveal fill transforms). */
   const prev = b.getBoundingClientRect();
   const w = Math.max(48, (b.offsetWidth || 120) * scale);
   const h = Math.max(40, (b.offsetHeight || 44) * scale);
-  const { x, y } = pickNoFleePoint(w, h);
+  if (screen && b.parentElement !== screen) screen.appendChild(b);
 
-  const dx = prev.left - x;
-  const dy = prev.top - y;
+  const { x, y } = pickNoFleePoint(w, h);
+  const sr = screen?.getBoundingClientRect();
+  const originX = sr ? sr.left : 0;
+  const originY = sr ? sr.top : 0;
+  const dx = prev.left - (originX + x);
+  const dy = prev.top - (originY + y);
   b.classList.add("flying");
   noFlying = true;
   /* Seed left/top + compensating translate in the same turn to avoid a flash */
@@ -6290,7 +6408,11 @@ async function openGiftBox() {
   const rv = $("#gift-reveal");
   if (rv) {
     rv.hidden = false;
-    reveal($$("#gift-reveal > *"), { step: 200, dur: 800 });
+    const revealKids = $$("#gift-reveal > *");
+    reveal(revealKids, { step: 200, dur: 800 });
+    /* Drop fill:"both" transforms so Nhi can position:fixed against the screen */
+    const fillClearAt = reduceMotion ? 140 : 800 + 200 * Math.max(0, revealKids.length - 1) + 40;
+    giftLater(clearGiftRevealAnimFills, fillClearAt);
   }
   Sound.play("sparkle");
   giftLater(() => FX.sparkles?.(innerWidth / 2, innerHeight * 0.3, 20), 500);
